@@ -1,0 +1,18 @@
+{
+  "name": "something",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "private": "true",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Henry James",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "three": "^0.138.3"
+  }
+}
