@@ -1,17 +1,15 @@
 {
-  "name": "something",
+  "name": "Something",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.html",
+  "description": "Digital storytelling piece",
+  "main": "src/index.js",
   "private": "true",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rm -r dist/*",
+    "env": "env"
   },
   "author": "Henry James",
   "license": "ISC",
-  "devDependencies": {
-    "webpack-cli": "^4.9.2"
-  },
   "dependencies": {
     "three": "^0.138.3"
   }

@@ -1,12 +1,12 @@
 "use strict";
 // Option 1: Import the entire three.js core library.
-import * as THREE from '/node_modules/three/build/three.module.js'
+import * as THREE from 'three';
 import {
     isMobile,
     getRandomInt,
     scale,
     isEmpty
-} from './usefulFunctions.js'
+} from './usefulFunctions.js';
 //////////////////////////////////////////////////////////////////////////////
 let pageLoadedFlag = false;
 window.onload = function () {
