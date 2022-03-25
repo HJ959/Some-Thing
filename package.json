@@ -2,15 +2,20 @@
   "name": "Something",
   "version": "1.0.0",
   "description": "Digital storytelling piece",
-  "main": "src/index.js",
   "private": "true",
   "scripts": {
     "clean": "rm -r dist/*",
-    "env": "env"
+    "env": "env",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
   },
   "author": "Henry James",
   "license": "ISC",
   "dependencies": {
     "three": "^0.138.3"
+  },
+  "devDependencies": {
+    "webpack": "^5.70.0",
+    "webpack-cli": "^4.9.2"
   }
 }
