@@ -7,6 +7,8 @@ import {
     scale,
     isEmpty
 } from './usefulFunctions.js';
+import "./css/normalise.css";
+import "./css/main.css";
 //////////////////////////////////////////////////////////////////////////////
 let pageLoadedFlag = false;
 window.onload = function () {
