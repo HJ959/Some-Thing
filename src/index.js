@@ -25,11 +25,15 @@ const scene = new THREE.Scene();
 // Objects
 const geometry = new THREE.TorusGeometry(.9, .1, 32, 100);
 
-// Materials
+// grab the video and create a video texture
+const video = document.getElementById('texture');
+const texture = new THREE.VideoTexture(video);
 
-const material = new THREE.MeshBasicMaterial();
+// Materials
+const material = new THREE.MeshBasicMaterial({map: texture});
 material.color = new THREE.Color(0xfffff);
 material.reflectivity = 0.8;
+
 
 // Mesh
 const sphere = new THREE.Mesh(geometry, material);
@@ -87,15 +91,20 @@ window.addEventListener('resize', () => {
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 })
+let mouseX, mouseY;
+onmousemove = function(e){
+    mouseX = e.clientX; 
+    mouseY = e.clientY;
+}
 
 const clock = new THREE.Clock();
 
 const tick = () => {
-
     const elapsedTime = clock.getElapsedTime();
 
     // Update objects
-    sphere.rotation.y = .2 * elapsedTime;
+    sphere.rotation.x = (mouseX * 0.0001);
+    sphere.rotation.y = (mouseY * 0.0001);
 
     // Update Orbital Controls
     // controls.update()
