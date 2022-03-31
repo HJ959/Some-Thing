@@ -1,6 +1,7 @@
 "use strict";
 // Option 1: Import the entire three.js core library.
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
     isMobile,
     getRandomInt,
@@ -62,8 +63,11 @@ camera.position.z = 2;
 scene.add(camera);
 
 // Controls
-// const controls = new OrbitControls(camera, canvas)
-// controls.enableDamping = true
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
+controls.mouseButtons = {
+	LEFT: THREE.MOUSE.PAN,
+}
 
 /**
  * Renderer
@@ -91,6 +95,7 @@ window.addEventListener('resize', () => {
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 })
+
 let mouseX, mouseY;
 onmousemove = function(e){
     mouseX = e.clientX; 
@@ -107,7 +112,7 @@ const tick = () => {
     sphere.rotation.y = (mouseY * 0.0001);
 
     // Update Orbital Controls
-    // controls.update()
+    controls.update()
 
     // Render
     renderer.render(scene, camera);
