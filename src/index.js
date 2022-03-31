@@ -22,16 +22,13 @@ const canvas = document.getElementById('webgl');
 
 // Scene
 const scene = new THREE.Scene();
+scene.background = new THREE.Color( 0xffffff );
 
 // Objects
 const geometry = new THREE.TorusGeometry(.9, .1, 32, 100);
 
-// grab the video and create a video texture
-const video = document.getElementById('texture');
-const texture = new THREE.VideoTexture(video);
-
 // Materials
-const material = new THREE.MeshBasicMaterial({map: texture});
+const material = new THREE.MeshBasicMaterial();
 material.color = new THREE.Color(0xfffff);
 material.reflectivity = 0.8;
 
@@ -108,8 +105,8 @@ const tick = () => {
     const elapsedTime = clock.getElapsedTime();
 
     // Update objects
-    sphere.rotation.x = (mouseX * 0.0001);
-    sphere.rotation.y = (mouseY * 0.0001);
+    sphere.rotation.x = 0.2 * elapsedTime;
+    sphere.rotation.y = 0.1 * elapsedTime;
 
     // Update Orbital Controls
     controls.update()
