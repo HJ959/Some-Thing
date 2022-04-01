@@ -1,7 +1,9 @@
 "use strict";
 // Option 1: Import the entire three.js core library.
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import {
+    OrbitControls
+} from 'three/examples/jsm/controls/OrbitControls.js';
 import {
     isMobile,
     getRandomInt,
@@ -11,18 +13,12 @@ import {
 import "./css/normalise.css";
 import "./css/main.css";
 //////////////////////////////////////////////////////////////////////////////
-let pageLoadedFlag = false;
-window.onload = function () {
-    pageLoadedFlag = true;
-}
-//////////////////////////////////////////////////////////////////////////////
-
 // Canvas
 const canvas = document.getElementById('webgl');
 
 // Scene
 const scene = new THREE.Scene();
-scene.background = new THREE.Color( 0xffffff );
+//scene.background = new THREE.Color(0xffffff);
 
 // Objects
 const geometry = new THREE.TorusGeometry(.9, .1, 32, 100);
@@ -32,13 +28,11 @@ const material = new THREE.MeshBasicMaterial();
 material.color = new THREE.Color(0xfffff);
 material.reflectivity = 0.8;
 
-
 // Mesh
 const sphere = new THREE.Mesh(geometry, material);
 scene.add(sphere);
 
 // Lights
-
 const light = new THREE.AmbientLight(0x404040); // soft white light
 scene.add(light);
 
@@ -48,11 +42,7 @@ const sizes = {
     height: window.innerHeight
 }
 
-
-/**
- * Camera
- */
-// Base camera
+// Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
 camera.position.x = 0;
 camera.position.y = 0;
@@ -63,22 +53,20 @@ scene.add(camera);
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 controls.mouseButtons = {
-	LEFT: THREE.MOUSE.PAN,
+    LEFT: THREE.MOUSE.PAN,
 }
 
-/**
- * Renderer
- */
+// Renderer
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+    canvas: canvas,
+    alpha: true
 });
 
+renderer.setClearColor(0x000000, 0);
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-/**
- * Animate
- */
+// keep the same size even if window is resized
 window.addEventListener('resize', () => {
     // Update sizes
     sizes.width = window.innerWidth;
@@ -93,10 +81,25 @@ window.addEventListener('resize', () => {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 })
 
-let mouseX, mouseY;
-onmousemove = function(e){
-    mouseX = e.clientX; 
-    mouseY = e.clientY;
+if (isMobile === true) {
+    // only play video when user interacts with piece to give movement
+    const mainVideo = document.getElementById('mainVideo');
+    window.addEventListener('touchstart', () => {
+        mainVideo.play();
+    })
+    window.addEventListener('touchend', () => {
+        mainVideo.pause();
+    })
+}
+if (isMobile === false) {
+    // only play video when user interacts with piece to give movement
+    const mainVideo = document.getElementById('mainVideo');
+    window.addEventListener('mousedown', () => {
+        mainVideo.play();
+    })
+    window.addEventListener('mouseup', () => {
+        mainVideo.pause();
+    })
 }
 
 const clock = new THREE.Clock();
