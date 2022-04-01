@@ -18,14 +18,15 @@ const canvas = document.getElementById('webgl');
 
 // Scene
 const scene = new THREE.Scene();
-//scene.background = new THREE.Color(0xffffff);
+scene.background = new THREE.Color(0xffffff);
 
 // Objects
-const geometry = new THREE.TorusGeometry(.9, .1, 32, 100);
+const geometry = new THREE.IcosahedronGeometry(0.75, 1);
 
 // Materials
 const material = new THREE.MeshBasicMaterial();
 material.color = new THREE.Color(0xfffff);
+material.wireframe = true;
 material.reflectivity = 0.8;
 
 // Mesh
@@ -50,10 +51,19 @@ camera.position.z = 2;
 scene.add(camera);
 
 // Controls
+var minPan = new THREE.Vector3(-2, -2, -2);
+var maxPan = new THREE.Vector3(2, 2, 2);
+
 const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+controls.enableDamping = true;
+controls.dampingFactor = 0.07;
+controls.enableZoom = false;
+controls.maxDistance = 2;
 controls.mouseButtons = {
     LEFT: THREE.MOUSE.PAN,
+}
+controls.touches = {
+    ONE: THREE.TOUCH.DOLLY_PAN
 }
 
 // Renderer
@@ -61,6 +71,17 @@ const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     alpha: true
 });
+
+var minPan = new THREE.Vector3(-1.5, -1.5, -1.5);
+var maxPan = new THREE.Vector3(1.5, 1.5, 1.5);
+var _v = new THREE.Vector3();
+
+controls.addEventListener("change", function () {
+    _v.copy(controls.target);
+    controls.target.clamp(minPan, maxPan);
+    _v.sub(controls.target);
+    camera.position.sub(_v);
+})
 
 renderer.setClearColor(0x000000, 0);
 renderer.setSize(sizes.width, sizes.height);
