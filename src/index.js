@@ -10,6 +10,7 @@ import {
     scale,
     isEmpty
 } from './usefulFunctions.js';
+import "./sound.js"
 import "./css/normalise.css";
 import "./css/main.css";
 //////////////////////////////////////////////////////////////////////////////
@@ -21,21 +22,21 @@ const objects = [];
 
 // Scene
 const scene = new THREE.Scene();
-// scene.background = new THREE.Color(0xffffff);
 
-// Objects
-const geometry = new THREE.IcosahedronGeometry(0.75, 3);
+// function to generate objects
 
+const geometry = new THREE.IcosahedronGeometry(0.25, 3);
 const texture = new THREE.TextureLoader().load("media/texture.jpg");
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
-texture.repeat.set( 8, 8 );
+texture.repeat.set(8, 8);
 
 // Materials
-const material = new THREE.MeshBasicMaterial({ map: texture });
-material.color = new THREE.Color(0xfffff);
+const material = new THREE.MeshBasicMaterial({
+    map: texture
+});
+material.color = new THREE.Color(0x00ffba);
 material.reflectivity = 0;
-
 
 // Mesh
 const sphere = new THREE.Mesh(geometry, material);
@@ -128,8 +129,17 @@ if (isMobile === false) {
 }
 
 const clock = new THREE.Clock();
+let saveCount = 0;
 
 const tick = () => {
+    // every now and then during the session, store the time 
+    // into a local storage var called lastseen
+    if (saveCount % 300 === 0) {
+        localStorage.setItem('lastseen', String(Date.now()));
+        saveCount = 0;        
+    }
+    saveCount++;
+    
     const elapsedTime = clock.getElapsedTime();
 
     // Update objects
@@ -141,6 +151,8 @@ const tick = () => {
 
     // Render
     renderer.render(scene, camera);
+
+    // save the time in local storage 
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick);
