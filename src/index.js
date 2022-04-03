@@ -16,21 +16,30 @@ import "./css/main.css";
 // Canvas
 const canvas = document.getElementById('webgl');
 
+// objects
+const objects = [];
+
 // Scene
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xffffff);
+// scene.background = new THREE.Color(0xffffff);
 
 // Objects
-const geometry = new THREE.IcosahedronGeometry(0.75, 1);
+const geometry = new THREE.IcosahedronGeometry(0.75, 3);
+
+const texture = new THREE.TextureLoader().load("media/texture.jpg");
+texture.wrapS = THREE.RepeatWrapping;
+texture.wrapT = THREE.RepeatWrapping;
+texture.repeat.set( 8, 8 );
 
 // Materials
-const material = new THREE.MeshBasicMaterial();
+const material = new THREE.MeshBasicMaterial({ map: texture });
 material.color = new THREE.Color(0xfffff);
-material.wireframe = true;
-material.reflectivity = 0.8;
+material.reflectivity = 0;
+
 
 // Mesh
 const sphere = new THREE.Mesh(geometry, material);
+
 scene.add(sphere);
 
 // Lights
@@ -50,21 +59,15 @@ camera.position.y = 0;
 camera.position.z = 2;
 scene.add(camera);
 
-// Controls
-var minPan = new THREE.Vector3(-2, -2, -2);
-var maxPan = new THREE.Vector3(2, 2, 2);
-
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true;
 controls.dampingFactor = 0.07;
 controls.enableZoom = false;
 controls.maxDistance = 2;
-controls.mouseButtons = {
-    LEFT: THREE.MOUSE.PAN,
-}
-controls.touches = {
-    ONE: THREE.TOUCH.DOLLY_PAN
-}
+
+// set up the controls, which buttons and touches do what
+controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+controls.touches.ONE = THREE.TOUCH.PAN;
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({
@@ -72,10 +75,11 @@ const renderer = new THREE.WebGLRenderer({
     alpha: true
 });
 
-var minPan = new THREE.Vector3(-1.5, -1.5, -1.5);
-var maxPan = new THREE.Vector3(1.5, 1.5, 1.5);
+// this bit sets up boundaries for the pan, effectively 
+// creating the edges of the 'map'
+var minPan = new THREE.Vector3(-10, -10, -10);
+var maxPan = new THREE.Vector3(10, 10, 10);
 var _v = new THREE.Vector3();
-
 controls.addEventListener("change", function () {
     _v.copy(controls.target);
     controls.target.clamp(minPan, maxPan);
