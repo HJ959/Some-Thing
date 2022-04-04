@@ -5,6 +5,9 @@ import {
     OrbitControls
 } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
+    GLTFLoader
+} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {
     isMobile,
     getRandomInt,
     scale,
@@ -22,26 +25,40 @@ const objects = [];
 
 // Scene
 const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xffffff, 0.1, 20)
 
-// function to generate objects
+// Instantiate a loader
+const loader = new GLTFLoader();
 
-const geometry = new THREE.IcosahedronGeometry(0.25, 3);
-const texture = new THREE.TextureLoader().load("media/texture.jpg");
-texture.wrapS = THREE.RepeatWrapping;
-texture.wrapT = THREE.RepeatWrapping;
-texture.repeat.set(8, 8);
+// create a group 
+const group = new THREE.Group();
 
-// Materials
-const material = new THREE.MeshBasicMaterial({
-    map: texture
-});
-material.color = new THREE.Color(0x00ffba);
-material.reflectivity = 0;
+// Load a glTF resource
+loader.load(
+    // resource URL
+    'media/something.gltf',
+    // called when the resource is loaded
+    function (gltf) {
+        scene.add(gltf.scene);
 
-// Mesh
-const sphere = new THREE.Mesh(geometry, material);
 
-scene.add(sphere);
+        gltf.animations; // Array<THREE.AnimationClip>
+        gltf.scene; // THREE.Group
+        gltf.scenes; // Array<THREE.Group>
+        gltf.cameras; // Array<THREE.Camera>
+        gltf.asset; // Object
+    },
+    // called while loading is progressing
+    function (xhr) {
+        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    },
+    // called when loading has errors
+    function (error) {
+        console.log('An error happened');
+    }
+);
+
+
 
 // Lights
 const light = new THREE.AmbientLight(0x404040); // soft white light
@@ -136,15 +153,21 @@ const tick = () => {
     // into a local storage var called lastseen
     if (saveCount % 300 === 0) {
         localStorage.setItem('lastseen', String(Date.now()));
-        saveCount = 0;        
+        saveCount = 0;
     }
     saveCount++;
-    
+
     const elapsedTime = clock.getElapsedTime();
 
+    scene.traverse(function (object) {
+        if (object.name === "Node_#0") {
+            object.rotation.x = 0.02 * elapsedTime;
+            object.rotation.z = 0.1 * elapsedTime;
+        }
+    });
     // Update objects
-    sphere.rotation.x = 0.2 * elapsedTime;
-    sphere.rotation.y = 0.1 * elapsedTime;
+    // gltf.scene.rotation.x = 0.2 * elapsedTime;
+    // gltf.scene.rotation.y = 0.1 * elapsedTime;
 
     // Update Orbital Controls
     controls.update()

@@ -14,7 +14,7 @@ document.querySelector('main').addEventListener('click', async () => {
         await Tone.start()
         console.log('audio is ready')
         toneStartFlag = true;
-        setup();
+        // setup();
     }
 })
 
