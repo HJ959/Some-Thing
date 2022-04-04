@@ -58,7 +58,10 @@ loader.load(
     }
 );
 
-
+const geometry = new THREE.PlaneGeometry( 10, 10 );
+const material = new THREE.MeshBasicMaterial( {color: 0xffffff, side: THREE.DoubleSide} );
+const plane = new THREE.Mesh( geometry, material );
+scene.add( plane );
 
 // Lights
 const light = new THREE.AmbientLight(0x404040); // soft white light
@@ -95,8 +98,8 @@ const renderer = new THREE.WebGLRenderer({
 
 // this bit sets up boundaries for the pan, effectively 
 // creating the edges of the 'map'
-var minPan = new THREE.Vector3(-10, -10, -10);
-var maxPan = new THREE.Vector3(10, 10, 10);
+var minPan = new THREE.Vector3(-5, -5, -5);
+var maxPan = new THREE.Vector3(5, 5, 5);
 var _v = new THREE.Vector3();
 controls.addEventListener("change", function () {
     _v.copy(controls.target);
@@ -152,6 +155,7 @@ const tick = () => {
     // every now and then during the session, store the time 
     // into a local storage var called lastseen
     if (saveCount % 300 === 0) {
+        // save the time in local storage 
         localStorage.setItem('lastseen', String(Date.now()));
         saveCount = 0;
     }
@@ -165,17 +169,12 @@ const tick = () => {
             object.rotation.z = 0.1 * elapsedTime;
         }
     });
-    // Update objects
-    // gltf.scene.rotation.x = 0.2 * elapsedTime;
-    // gltf.scene.rotation.y = 0.1 * elapsedTime;
 
     // Update Orbital Controls
     controls.update()
 
     // Render
     renderer.render(scene, camera);
-
-    // save the time in local storage 
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick);
