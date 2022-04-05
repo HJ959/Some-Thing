@@ -7,13 +7,14 @@ import {
 import {
     GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import "./ThreeSteer.js"
 import {
     isMobile,
     getRandomInt,
     scale,
     isEmpty
 } from './usefulFunctions.js';
-import "./sound.js"
+// import "./sound.js"
 import "./css/normalise.css";
 import "./css/main.css";
 //////////////////////////////////////////////////////////////////////////////
@@ -33,6 +34,9 @@ const loader = new GLTFLoader();
 // create a group 
 const group = new THREE.Group();
 
+let something;
+let somethingLoadedFlag = false;
+
 // Load a glTF resource
 loader.load(
     // resource URL
@@ -40,13 +44,18 @@ loader.load(
     // called when the resource is loaded
     function (gltf) {
         scene.add(gltf.scene);
-
-
         gltf.animations; // Array<THREE.AnimationClip>
         gltf.scene; // THREE.Group
+        gltf.scene.name = "something"
+        gltf.scene.scale.set(1.5, 1.5, 1.5);
         gltf.scenes; // Array<THREE.Group>
         gltf.cameras; // Array<THREE.Camera>
         gltf.asset; // Object
+
+        // grab the something once its loaded and mark as loaded
+        something = scene.getObjectByName("something")
+        somethingLoadedFlag = true;
+        // createSomething();
     },
     // called while loading is progressing
     function (xhr) {
@@ -58,10 +67,28 @@ loader.load(
     }
 );
 
-const geometry = new THREE.PlaneGeometry( 10, 10 );
-const material = new THREE.MeshBasicMaterial( {color: 0xffffff, side: THREE.DoubleSide} );
-const plane = new THREE.Mesh( geometry, material );
-scene.add( plane );
+var somethingMaterial, somethingMesh;
+function createSomething() {
+    // var geometry = new THREE.BoxGeometry(100, 200, 50);
+    somethingMaterial = new THREE.MeshBasicMaterial({
+        color: 0xFFFFFF,
+        wireframe: false
+    });
+    somethingMesh = new THREE.Mesh(something, somethingMaterial);
+
+    entity = new SteeringEntity(somethingMesh);
+    console.log(entity);
+    scene.add(entity);
+}
+
+const geometry = new THREE.PlaneGeometry(10, 10);
+const texture = new THREE.TextureLoader().load('media/green_map.jpeg');
+const material = new THREE.MeshBasicMaterial({
+    side: THREE.DoubleSide,
+    map: texture
+});
+const plane = new THREE.Mesh(geometry, material);
+scene.add(plane);
 
 // Lights
 const light = new THREE.AmbientLight(0x404040); // soft white light
@@ -163,12 +190,10 @@ const tick = () => {
 
     const elapsedTime = clock.getElapsedTime();
 
-    scene.traverse(function (object) {
-        if (object.name === "Node_#0") {
-            object.rotation.x = 0.02 * elapsedTime;
-            object.rotation.z = 0.1 * elapsedTime;
-        }
-    });
+    if (somethingLoadedFlag === true) {
+        // something.rotation.x = 0.02 * elapsedTime;
+        // something.rotation.z = 0.1 * elapsedTime;
+    }
 
     // Update Orbital Controls
     controls.update()

@@ -4,9 +4,6 @@
 // import tone
 import * as Tone from 'tone'
 
-var loopBeat;
-var synth;
-
 //attach a click listener to a play button
 let toneStartFlag = false;
 document.querySelector('main').addEventListener('click', async () => {
