@@ -82,7 +82,7 @@ function createSomething() {
 }
 
 const geometry = new THREE.PlaneGeometry(10, 10);
-const texture = new THREE.TextureLoader().load('media/green_map.jpeg');
+const texture = new THREE.TextureLoader().load('media/green_map.jpg');
 const material = new THREE.MeshBasicMaterial({
     side: THREE.DoubleSide,
     map: texture

@@ -4,7 +4,7 @@
   "description": "Digital storytelling piece",
   "private": "true",
   "scripts": {
-    "clean": "rm -r dist/* && rm -r dev/*",
+    "clean": "rm dist/* && rm dev/*",
     "env": "env",
     "start": "webpack serve --open --config webpack.dev.config.js",
     "prebuild-prod": "cp src/media/* dist/media",
