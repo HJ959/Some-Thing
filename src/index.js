@@ -47,7 +47,7 @@ loader.load(
         gltf.animations; // Array<THREE.AnimationClip>
         gltf.scene; // THREE.Group
         gltf.scene.name = "something"
-        gltf.scene.scale.set(1.5, 1.5, 1.5);
+        gltf.scene.scale.set(2, 2, 2);
         gltf.scenes; // Array<THREE.Group>
         gltf.cameras; // Array<THREE.Camera>
         gltf.asset; // Object
@@ -67,28 +67,56 @@ loader.load(
     }
 );
 
-var somethingMaterial, somethingMesh;
-function createSomething() {
-    // var geometry = new THREE.BoxGeometry(100, 200, 50);
-    somethingMaterial = new THREE.MeshBasicMaterial({
-        color: 0xFFFFFF,
-        wireframe: false
-    });
-    somethingMesh = new THREE.Mesh(something, somethingMaterial);
+// var somethingMaterial, somethingMesh;
+// function createSomething() {
+//     // var geometry = new THREE.BoxGeometry(100, 200, 50);
+//     somethingMaterial = new THREE.MeshBasicMaterial({
+//         color: 0xFFFFFF,
+//         wireframe: false
+//     });
+//     somethingMesh = new THREE.Mesh(something, somethingMaterial);
 
-    entity = new SteeringEntity(somethingMesh);
-    console.log(entity);
-    scene.add(entity);
+//     entity = new SteeringEntity(somethingMesh);
+//     console.log(entity);
+//     scene.add(entity);
+// }
+
+const importTexture = async(url, material) => {
+    const loader = new THREE.TextureLoader();
+    const texture = await loader.loadAsync(url);
+    material.map = texture;
+    material.transparent = true;
+    material.needsUpdate = true;
+    return texture;
 }
 
-const geometry = new THREE.PlaneGeometry(10, 10);
-const texture = new THREE.TextureLoader().load('media/green_map.jpg');
-const material = new THREE.MeshBasicMaterial({
-    side: THREE.DoubleSide,
-    map: texture
-});
-const plane = new THREE.Mesh(geometry, material);
-scene.add(plane);
+//usage
+const mapGeo = new THREE.PlaneGeometry(10, 10);
+
+const matDetails = new THREE.MeshBasicMaterial();
+const meshDetails = new THREE.Mesh(mapGeo, matDetails);
+scene.add(meshDetails);
+
+const matOne = new THREE.MeshBasicMaterial();
+const meshOne = new THREE.Mesh(mapGeo, matOne);
+meshOne.translateZ(-0.7);
+scene.add(meshOne);
+
+const matTwo = new THREE.MeshBasicMaterial();
+const meshTwo = new THREE.Mesh(mapGeo, matTwo);
+meshTwo.translateZ(-0.5);
+scene.add(meshTwo);
+
+const matThree = new THREE.MeshBasicMaterial();
+const meshThree = new THREE.Mesh(mapGeo, matThree);
+meshThree.translateZ(-0.3);
+scene.add(meshThree);
+
+//this is asynchronous
+importTexture('media/details.png', matDetails);
+importTexture('media/map_1.png', matOne);
+importTexture('media/map_2.png', matTwo);
+importTexture('media/map_3.png', matThree);
 
 // Lights
 const light = new THREE.AmbientLight(0x404040); // soft white light
@@ -110,8 +138,9 @@ scene.add(camera);
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true;
 controls.dampingFactor = 0.07;
-controls.enableZoom = false;
-controls.maxDistance = 2;
+controls.enableZoom = true;
+controls.maxDistance = 2.5;
+controls.minDistance = 1;
 
 // set up the controls, which buttons and touches do what
 controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
@@ -177,6 +206,8 @@ if (isMobile === false) {
 
 const clock = new THREE.Clock();
 let saveCount = 0;
+let cameraXCount = 0;
+let cameraYCount = 0;
 
 const tick = () => {
     // every now and then during the session, store the time 
@@ -191,8 +222,8 @@ const tick = () => {
     const elapsedTime = clock.getElapsedTime();
 
     if (somethingLoadedFlag === true) {
-        // something.rotation.x = 0.02 * elapsedTime;
-        // something.rotation.z = 0.1 * elapsedTime;
+        something.rotation.x = 0.02 * elapsedTime;
+        something.rotation.z = 0.1 * elapsedTime;
     }
 
     // Update Orbital Controls
