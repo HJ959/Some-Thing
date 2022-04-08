@@ -26,7 +26,8 @@ const objects = [];
 
 // Scene
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0xffffff, 0.1, 20)
+scene.fog = new THREE.Fog(0x000000, 0.1, 20)
+scene.background = new THREE.Color(0x000000);
 
 // Instantiate a loader
 const loader = new GLTFLoader();
@@ -95,21 +96,22 @@ const mapGeo = new THREE.PlaneGeometry(10, 10);
 
 const matDetails = new THREE.MeshBasicMaterial();
 const meshDetails = new THREE.Mesh(mapGeo, matDetails);
+meshDetails.translateZ(-0.5);
 scene.add(meshDetails);
 
 const matOne = new THREE.MeshBasicMaterial();
 const meshOne = new THREE.Mesh(mapGeo, matOne);
-meshOne.translateZ(-0.7);
+meshOne.translateZ(-0.8);
 scene.add(meshOne);
 
 const matTwo = new THREE.MeshBasicMaterial();
 const meshTwo = new THREE.Mesh(mapGeo, matTwo);
-meshTwo.translateZ(-0.5);
+meshTwo.translateZ(-2.7);
 scene.add(meshTwo);
 
 const matThree = new THREE.MeshBasicMaterial();
 const meshThree = new THREE.Mesh(mapGeo, matThree);
-meshThree.translateZ(-0.3);
+meshThree.translateZ(-1.7);
 scene.add(meshThree);
 
 //this is asynchronous
@@ -151,6 +153,8 @@ const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     alpha: true
 });
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // this bit sets up boundaries for the pan, effectively 
 // creating the edges of the 'map'
@@ -164,9 +168,6 @@ controls.addEventListener("change", function () {
     camera.position.sub(_v);
 })
 
-renderer.setClearColor(0x000000, 0);
-renderer.setSize(sizes.width, sizes.height);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // keep the same size even if window is resized
 window.addEventListener('resize', () => {
@@ -206,8 +207,6 @@ if (isMobile === false) {
 
 const clock = new THREE.Clock();
 let saveCount = 0;
-let cameraXCount = 0;
-let cameraYCount = 0;
 
 const tick = () => {
     // every now and then during the session, store the time 
