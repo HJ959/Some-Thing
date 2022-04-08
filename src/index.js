@@ -27,7 +27,7 @@ const objects = [];
 // Scene
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x000000, 0.1, 20)
-scene.background = new THREE.Color(0x000000);
+// scene.background = new THREE.Color(0x000000);
 
 // Instantiate a loader
 const loader = new GLTFLoader();
@@ -153,6 +153,7 @@ const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     alpha: true
 });
+renderer.setClearColor( 0x000000, 0 ); // the default
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
