@@ -14,7 +14,7 @@ import {
     scale,
     isEmpty
 } from './usefulFunctions.js';
-// import "./sound.js"
+import "./sound.js"
 import "./css/normalise.css";
 import "./css/main.css";
 //////////////////////////////////////////////////////////////////////////////

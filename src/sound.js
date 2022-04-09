@@ -3,6 +3,10 @@
 
 // import tone
 import * as Tone from 'tone'
+import {
+    getRandomInt,
+    isMobile
+} from './usefulFunctions';
 
 //attach a click listener to a play button
 let toneStartFlag = false;
@@ -11,18 +15,50 @@ document.querySelector('main').addEventListener('click', async () => {
         await Tone.start()
         console.log('audio is ready')
         toneStartFlag = true;
-        // setup();
+        setup();
     }
 })
 
+let notes = ["D#4", "E#4", "G#4", "A#4", "C#4", "D#5", "E#5", "G#5", "A#5", "C#5"];
+
 function setup() {
-    const osc = new Tone.Oscillator().toDestination();
-    // repeated event every 8th note
-    Tone.Transport.scheduleRepeat((time) => {
-        // use the callback time to schedule events
-        osc.start(time).stop(time + 0.1);
-    }, "2n");
-    // transport must be started before it starts invoking events
+
+    // create the synth
+    const synth = new Tone.PolySynth().toDestination();
+    // set the attributes across all the voices using 'set'
+    synth.set({
+        detune: -1200
+    });
+
+    // CREATE a gain
+
+    const loop = new Tone.Loop((time) => {
+        // triggered every eighth note.
+        synth.triggerAttackRelease(notes[getRandomInt(0, notes.length)], 0.1);
+
+    }, "8n").start(0);
+
     Tone.Transport.start();
-    Tone.Transport.bpm.value = 180;
+}
+
+
+if (isMobile === true) {
+    // only play video when user interacts with piece to give movement
+    const mainVideo = document.getElementById('mainVideo');
+    window.addEventListener('touchstart', () => {
+        Tone.Transport.bpm.rampTo(200, 0.1);
+    })
+    window.addEventListener('touchend', () => {
+        Tone.Transport.bpm.rampTo(20, 0.2);
+    })
+}
+if (isMobile === false) {
+    // only play video when user interacts with piece to give movement
+    const mainVideo = document.getElementById('mainVideo');
+    window.addEventListener('mousedown', () => {
+        Tone.Transport.bpm.rampTo(200, 0.1);
+    })
+    window.addEventListener('mouseup', () => {
+        Tone.Transport.bpm.rampTo(20, 0.2);
+    })
 }
