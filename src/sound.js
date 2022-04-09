@@ -8,17 +8,28 @@ import {
     isMobile
 } from './usefulFunctions';
 
-//attach a click listener to a play button
+//attach a click listener to a play button 
 let toneStartFlag = false;
-document.querySelector('main').addEventListener('click', async () => {
-    if (toneStartFlag === false) {
-        await Tone.start()
-        console.log('audio is ready')
-        toneStartFlag = true;
-        setup();
-    }
-})
-
+if (isMobile === false) {
+    document.querySelector('main').addEventListener('click', async () => {
+        if (toneStartFlag === false) {
+            await Tone.start()
+            console.log('audio is ready')
+            toneStartFlag = true;
+            setup();
+        }
+    })
+}
+if (isMobile === true) {
+    document.querySelector('main').addEventListener('ontouch', async () => {
+        if (toneStartFlag === false) {
+            await Tone.start()
+            console.log('audio is ready')
+            toneStartFlag = true;
+            setup();
+        }
+    })
+}
 let notes = ["D#4", "E#4", "G#4", "A#4", "C#4", "D#5", "E#5", "G#5", "A#5", "C#5"];
 
 function setup() {
