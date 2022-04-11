@@ -30,9 +30,21 @@ if (isMobile === true) {
         }
     })
 }
+
 let notes = ["D#4", "E#4", "G#4", "A#4", "C#4", "D#5", "E#5", "G#5", "A#5", "C#5"];
+const vocalSamples = [];
+var player;
 
 function setup() {
+    const vocalSamples = new Tone.ToneAudioBuffers({
+        happy1: "/media/voiceHappy/happy_1.mp3",
+        happy2: "/media/voiceHappy/happy_2.mp3",
+    }, () => {
+        player = new Tone.Player().toDestination();
+        // play one of the samples when they all load
+        player.buffer = vocalSamples.get("happy1");
+        player.start();
+    });
 
     // create the synth
     const synth = new Tone.PolySynth().toDestination();
@@ -40,6 +52,7 @@ function setup() {
     synth.set({
         detune: -1200
     });
+
 
     // CREATE a gain
 

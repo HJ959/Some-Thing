@@ -7,9 +7,9 @@
     "clean": "rm dist/* && rm dev/*",
     "env": "env",
     "start": "webpack serve --open --config webpack.dev.config.js",
-    "prebuild-prod": "cp src/media/* dist/media",
+    "prebuild-prod": "cp -r src/media/* dist/media",
     "build-prod": "webpack --config webpack.prod.config.js && babel dist -d dist",
-    "prebuild-dev": "cp src/media/* dev/media",
+    "prebuild-dev": "cp -r src/media/* dev/media",
     "build-dev": "webpack --config webpack.dev.config.js --watch"
   },
   "author": "Henry James",

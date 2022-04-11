@@ -11,39 +11,48 @@ Neee bother.
 Would love to hear how though!
 */
 
-function checkIfStorage() {
+export function checkIfStorage() {
     if (storageAvailable('localStorage')) {
         // Yippee! We can use localStorage awesomeness
         return(true);   
     }
     else {
-        alert("A storage feature is not available in your browser, the game will not function properly.");
+        alert("A storage feature is not available in your browser, the game will not work properly.");
         // Too bad, no localStorage for us
     }
 }
 
 // Store the energy levels in local storage
-function storeEnergy(energyLevel) {
-    if (checkIfStorage() === true) localStorage.setItem('energy', String(energyLevel));
+export function initEnergy() {
+    if (checkIfStorage() === true) {
+        if (typeof readEnergy() === 'undefined' || readEnergy() === "null") {
+            localStorage.setItem('energy', "0");
+        }
+    }
+}
+
+// Store the energy levels in local storage
+export function storeEnergy(energyLevel) {
+    localStorage.setItem('energy', String(energyLevel));
 }
 
 // to decrease
-function decreaseEnergy(energyDecrease) {
+export function decreaseEnergy(energyDecrease) {
     storeEnergy(readEnergy() - energyDecrease);
 }
 
 // to increase
-function increaseEnergy(energyIncrease) {
+export function increaseEnergy(energyIncrease) {
     storeEnergy(readEnergy() + energyIncrease);
 }
 
 // to read
-function readEnergy() {
+export function readEnergy() {
     if (checkIfStorage() === true) return(parseInt(localStorage.getItem('energy')));
 }
 
 // taken for the mozzila MDN site
-function storageAvailable(type) {
+export function storageAvailable(type) {
     var storage;
     try {
         storage = window[type];

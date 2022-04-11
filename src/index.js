@@ -15,14 +15,15 @@ import {
     isEmpty
 } from './usefulFunctions.js';
 import "./sound.js"
+import * as ENRGY from './energySystem.js'
 import "./css/normalise.css";
 import "./css/main.css";
 //////////////////////////////////////////////////////////////////////////////
 // Canvas
 const canvas = document.getElementById('webgl');
 
-// objects
-const objects = [];
+// init energy system
+ENRGY.initEnergy();
 
 // Scene
 const scene = new THREE.Scene();
@@ -139,7 +140,7 @@ scene.add(camera);
 
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true;
-controls.dampingFactor = 0.07;
+controls.dampingFactor = 0.08;
 controls.enableZoom = true;
 controls.maxDistance = 2.5;
 controls.minDistance = 1;
@@ -185,13 +186,18 @@ window.addEventListener('resize', () => {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 })
 
+let touchEnergy = 0;
+let mousedownTime;
 if (isMobile === true) {
     // only play video when user interacts with piece to give movement
     const mainVideo = document.getElementById('mainVideo');
     window.addEventListener('touchstart', () => {
+        mousedownTime = new Date().getTime();
         mainVideo.play();
     })
     window.addEventListener('touchend', () => {
+        const mouseupTime = new Date().getTime(),
+        timeDifference = mouseupTime - mousedownTime;
         mainVideo.pause();
     })
 }
@@ -199,25 +205,39 @@ if (isMobile === false) {
     // only play video when user interacts with piece to give movement
     const mainVideo = document.getElementById('mainVideo');
     window.addEventListener('mousedown', () => {
+        mousedownTime = new Date().getTime();
         mainVideo.play();
     })
     window.addEventListener('mouseup', () => {
+        const mouseupTime = new Date().getTime(),
+        timeDifference = mouseupTime - mousedownTime;
+        ENRGY.increaseEnergy(timeDifference);
         mainVideo.pause();
     })
 }
 
 const clock = new THREE.Clock();
 let saveCount = 0;
+let liveEnergyCounter = 0;
 
 const tick = () => {
     // every now and then during the session, store the time 
     // into a local storage var called lastseen
     if (saveCount % 300 === 0) {
         // save the time in local storage 
-        localStorage.setItem('lastseen', String(Date.now()));
+        localStorage.setItem('lastSeen', String(Date.now()));
         saveCount = 0;
     }
     saveCount++;
+
+    // gradually decrease the energy if its more than 0
+    if (liveEnergyCounter % 50000 === 0) {
+        // decrease energy
+        if (ENRGY.readEnergy() > 0) {
+            ENRGY.decreaseEnergy(1);
+        }
+        liveEnergyCounter = 0;
+    }
 
     const elapsedTime = clock.getElapsedTime();
 
