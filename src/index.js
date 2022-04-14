@@ -209,8 +209,9 @@ if (isMobile === false) {
         mainVideo.play();
     })
     window.addEventListener('mouseup', () => {
+        // figure out the time now the mouse is up
         const mouseupTime = new Date().getTime(),
-        timeDifference = mouseupTime - mousedownTime;
+        timeDifference = (mouseupTime - mousedownTime) * 0.5;
         ENRGY.increaseEnergy(timeDifference);
         mainVideo.pause();
     })
@@ -219,6 +220,7 @@ if (isMobile === false) {
 const clock = new THREE.Clock();
 let saveCount = 0;
 let liveEnergyCounter = 0;
+let currentEnergy;
 
 const tick = () => {
     // every now and then during the session, store the time 
@@ -231,12 +233,12 @@ const tick = () => {
     saveCount++;
 
     // gradually decrease the energy if its more than 0
-    if (liveEnergyCounter % 50000 === 0) {
+    if (liveEnergyCounter % 10000 === 0) {
         // decrease energy
-        if (ENRGY.readEnergy() > 0) {
-            ENRGY.decreaseEnergy(1);
-        }
+        currentEnergy = ENRGY.decreaseEnergy(1);
         liveEnergyCounter = 0;
+
+        canvas.style.filter = "saturate(" + currentEnergy*0.001 + ") blur(" + (1000-currentEnergy)*0.01+ "px)";
     }
 
     const elapsedTime = clock.getElapsedTime();

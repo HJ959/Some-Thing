@@ -38,12 +38,17 @@ export function storeEnergy(energyLevel) {
 
 // to decrease
 export function decreaseEnergy(energyDecrease) {
-    storeEnergy(readEnergy() - energyDecrease);
+    var energy = readEnergy();
+    if (energy > 0) storeEnergy(energy - energyDecrease);
+    return energy;
 }
 
 // to increase
 export function increaseEnergy(energyIncrease) {
-    storeEnergy(readEnergy() + energyIncrease);
+    var energy = readEnergy();
+    if (energy + energyIncrease < 1000) storeEnergy(energy + energyIncrease);
+    if (energy + energyIncrease > 1000) storeEnergy(1000);
+    return energy;
 }
 
 // to read
