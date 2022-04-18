@@ -25,7 +25,7 @@ export function checkIfStorage() {
 // Store the energy levels in local storage
 export function initEnergy() {
     if (checkIfStorage() === true) {
-        if (typeof readEnergy() === 'undefined' || readEnergy() === "null") {
+        if (typeof readEnergy() === 'undefined' || readEnergy() === "null" || readEnergy() === "NaN") {
             localStorage.setItem('energy', "0");
         }
     }
