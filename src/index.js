@@ -48,16 +48,16 @@ loader.load(
     // called when the resource is loaded
     function (gltf) {
         scene.add(gltf.scene);
-        const animations = gltf.animations;
+        // const animations = gltf.animations;
 
-        mixer = new THREE.AnimationMixer(gltf.scene);
+        // mixer = new THREE.AnimationMixer(gltf.scene);
 
-        floatAction = mixer.clipAction(animations[0]);
-        swimAction = mixer.clipAction(animations[1]);
-        // https://github.com/mrdoob/three.js/blob/master/examples/webgl_animation_skinning_blending.html
-        actions = [floatAction, swimAction];
+        // floatAction = mixer.clipAction(animations[0]);
+        // swimAction = mixer.clipAction(animations[1]);
+        // // https://github.com/mrdoob/three.js/blob/master/examples/webgl_animation_skinning_blending.html
+        // actions = [floatAction, swimAction];
 
-        activateAllActions();
+        // activateAllActions();
 
         gltf.scene; // THREE.Group
         gltf.scene.name = "something"
