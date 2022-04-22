@@ -54,7 +54,7 @@ loader.load(
 
         floatAction = mixer.clipAction(animations[0]);
         swimAction = mixer.clipAction(animations[1]);
-
+        // https://github.com/mrdoob/three.js/blob/master/examples/webgl_animation_skinning_blending.html
         actions = [floatAction, swimAction];
 
         activateAllActions();
