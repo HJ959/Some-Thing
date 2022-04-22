@@ -38,18 +38,30 @@ const group = new THREE.Group();
 
 let something;
 let somethingLoadedFlag = false;
+let mixer, actions;
+let floatAction, swimAction;
 
 // Load a glTF resource
 loader.load(
     // resource URL
-    'media/something.gltf',
+    'media/somethinganimation.glb',
     // called when the resource is loaded
     function (gltf) {
         scene.add(gltf.scene);
-        gltf.animations; // Array<THREE.AnimationClip>
+        const animations = gltf.animations;
+
+        mixer = new THREE.AnimationMixer(gltf.scene);
+
+        floatAction = mixer.clipAction(animations[0]);
+        swimAction = mixer.clipAction(animations[1]);
+
+        actions = [floatAction, swimAction];
+
+        activateAllActions();
+
         gltf.scene; // THREE.Group
         gltf.scene.name = "something"
-        gltf.scene.scale.set(2, 2, 2);
+        gltf.scene.scale.set(1, 1, 1);
         gltf.scenes; // Array<THREE.Group>
         gltf.cameras; // Array<THREE.Camera>
         gltf.asset; // Object
@@ -69,6 +81,12 @@ loader.load(
     }
 );
 
+function activateAllActions() {
+    actions.forEach(function (action) {
+        action.play();
+    });
+}
+
 // var somethingMaterial, somethingMesh;
 // function createSomething() {
 //     // var geometry = new THREE.BoxGeometry(100, 200, 50);
@@ -83,7 +101,7 @@ loader.load(
 //     scene.add(entity);
 // }
 
-const importTexture = async(url, material) => {
+const importTexture = async (url, material) => {
     const loader = new THREE.TextureLoader();
     const texture = await loader.loadAsync(url);
     material.map = texture;
@@ -154,7 +172,7 @@ const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     alpha: true
 });
-renderer.setClearColor( 0x000000, 0 ); // the default
+renderer.setClearColor(0x000000, 0); // the default
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -197,7 +215,7 @@ if (isMobile === true) {
     })
     window.addEventListener('touchend', () => {
         const mouseupTime = new Date().getTime(),
-        timeDifference = mouseupTime - mousedownTime;
+            timeDifference = mouseupTime - mousedownTime;
         mainVideo.pause();
     })
 }
@@ -211,7 +229,7 @@ if (isMobile === false) {
     window.addEventListener('mouseup', () => {
         // figure out the time now the mouse is up
         const mouseupTime = new Date().getTime(),
-        timeDifference = (mouseupTime - mousedownTime) * 0.5;
+            timeDifference = (mouseupTime - mousedownTime) * 0.5;
         ENRGY.increaseEnergy(timeDifference);
         mainVideo.pause();
     })
@@ -233,12 +251,12 @@ const tick = () => {
     saveCount++;
 
     // gradually decrease the energy if its more than 0
-    if (liveEnergyCounter % 10000 === 0) {
+    if (liveEnergyCounter % 1000000 === 0) {
         // decrease energy
         currentEnergy = ENRGY.decreaseEnergy(1);
         liveEnergyCounter = 0;
 
-        canvas.style.filter = "saturate(" + currentEnergy*0.001 + ") blur(" + (1000-currentEnergy)*0.01+ "px)";
+        canvas.style.filter = "saturate(" + currentEnergy * 0.001 + ") blur(" + (1000 - currentEnergy) * 0.001 + "px)";
     }
 
     const elapsedTime = clock.getElapsedTime();

@@ -25,8 +25,14 @@ export function checkIfStorage() {
 // Store the energy levels in local storage
 export function initEnergy() {
     if (checkIfStorage() === true) {
-        if (typeof readEnergy() === 'undefined' || readEnergy() === "null" || readEnergy() === "NaN") {
-            localStorage.setItem('energy', "0");
+        let energyValue = parseInt(readEnergy());
+        if (energyValue > 1000) {
+            localStorage.setItem("energy", "1000");
+        } else if (energyValue < 1000) {
+            console.log("Energy level below 1000, keeping last known stats");
+        }
+        else {
+            localStorage.setItem("energy", "0");
         }
     }
 }
