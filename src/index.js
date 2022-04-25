@@ -7,7 +7,7 @@ import {
 import {
     GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import "./ThreeSteer.js"
+// import { Entity, SteeringEntity } from './ThreeSteer.js';
 import {
     isMobile,
     getRandomInt,
@@ -48,20 +48,14 @@ loader.load(
     // called when the resource is loaded
     function (gltf) {
         scene.add(gltf.scene);
-        // const animations = gltf.animations;
-
-        // mixer = new THREE.AnimationMixer(gltf.scene);
-
-        // floatAction = mixer.clipAction(animations[0]);
-        // swimAction = mixer.clipAction(animations[1]);
-        // // https://github.com/mrdoob/three.js/blob/master/examples/webgl_animation_skinning_blending.html
-        // actions = [floatAction, swimAction];
-
-        // activateAllActions();
+        mixer = new THREE.AnimationMixer(gltf.scene);
+        var action = mixer.clipAction(gltf.animations[0]);
+        action.play();
 
         gltf.scene; // THREE.Group
         gltf.scene.name = "something"
-        gltf.scene.scale.set(1, 1, 1);
+        gltf.scene.castShadow = true;
+        gltf.scene.scale.set(0.4, 0.4, 0.4);
         gltf.scenes; // Array<THREE.Group>
         gltf.cameras; // Array<THREE.Camera>
         gltf.asset; // Object
@@ -87,20 +81,6 @@ function activateAllActions() {
     });
 }
 
-// var somethingMaterial, somethingMesh;
-// function createSomething() {
-//     // var geometry = new THREE.BoxGeometry(100, 200, 50);
-//     somethingMaterial = new THREE.MeshBasicMaterial({
-//         color: 0xFFFFFF,
-//         wireframe: false
-//     });
-//     somethingMesh = new THREE.Mesh(something, somethingMaterial);
-
-//     entity = new SteeringEntity(somethingMesh);
-//     console.log(entity);
-//     scene.add(entity);
-// }
-
 const importTexture = async (url, material) => {
     const loader = new THREE.TextureLoader();
     const texture = await loader.loadAsync(url);
@@ -111,26 +91,30 @@ const importTexture = async (url, material) => {
 }
 
 //usage
-const mapGeo = new THREE.PlaneGeometry(10, 10);
+const mapGeo = new THREE.PlaneGeometry(7, 7);
 
 const matDetails = new THREE.MeshBasicMaterial();
 const meshDetails = new THREE.Mesh(mapGeo, matDetails);
 meshDetails.translateZ(-0.5);
+meshDetails.castShadow = true;
 scene.add(meshDetails);
 
 const matOne = new THREE.MeshBasicMaterial();
 const meshOne = new THREE.Mesh(mapGeo, matOne);
 meshOne.translateZ(-0.8);
+meshOne.castShadow = true;
 scene.add(meshOne);
 
 const matTwo = new THREE.MeshBasicMaterial();
 const meshTwo = new THREE.Mesh(mapGeo, matTwo);
 meshTwo.translateZ(-2.7);
+meshTwo.castShadow = true;
 scene.add(meshTwo);
 
 const matThree = new THREE.MeshBasicMaterial();
 const meshThree = new THREE.Mesh(mapGeo, matThree);
 meshThree.translateZ(-1.7);
+meshThree.castShadow = true;
 scene.add(meshThree);
 
 //this is asynchronous
@@ -140,8 +124,21 @@ importTexture('media/map_2.png', matTwo);
 importTexture('media/map_3.png', matThree);
 
 // Lights
-const light = new THREE.AmbientLight(0x404040); // soft white light
-scene.add(light);
+// white spotlight shining from the side, casting a shadow
+
+const spotLight = new THREE.SpotLight( 0xffffff );
+spotLight.position.set( 100, 1000, 100 );
+
+spotLight.castShadow = true;
+
+spotLight.shadow.mapSize.width = 1024;
+spotLight.shadow.mapSize.height = 1024;
+
+spotLight.shadow.camera.near = 500;
+spotLight.shadow.camera.far = 4000;
+spotLight.shadow.camera.fov = 30;
+
+scene.add( spotLight );
 
 // Sizes
 const sizes = {
@@ -170,7 +167,8 @@ controls.touches.ONE = THREE.TOUCH.PAN;
 // Renderer
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
-    alpha: true
+    alpha: true,
+    antialias: true
 });
 renderer.setClearColor(0x000000, 0); // the default
 renderer.setSize(sizes.width, sizes.height);
@@ -178,8 +176,8 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // this bit sets up boundaries for the pan, effectively 
 // creating the edges of the 'map'
-var minPan = new THREE.Vector3(-5, -5, -5);
-var maxPan = new THREE.Vector3(5, 5, 5);
+var minPan = new THREE.Vector3(-4, -4, -4);
+var maxPan = new THREE.Vector3(4, 4, 4);
 var _v = new THREE.Vector3();
 controls.addEventListener("change", function () {
     _v.copy(controls.target);
@@ -265,6 +263,9 @@ const tick = () => {
         something.rotation.x = 0.02 * elapsedTime;
         something.rotation.z = 0.1 * elapsedTime;
     }
+
+    var delta = clock.getDelta();
+    if ( mixer ) mixer.update( delta );
 
     // Update Orbital Controls
     controls.update()

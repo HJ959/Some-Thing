@@ -1,9 +1,8 @@
-/* Taken from https://github.com/erosmarcon/three-steer 
-Thank you for the wonderful code! 
-
+/*
 MIT License
 
 Copyright (c) 2018 Eros Marcon
+https://github.com/erosmarcon/three-steer
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +21,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
+
 import * as THREE from 'three';
+
 var Entity = function (mesh) {
 
     THREE.Group.apply(this);
@@ -153,25 +154,20 @@ Entity.prototype = Object.assign(Object.create(THREE.Group.prototype), {
     wrap: function (box) {
         if (this.position.x > box.max.x) {
             this.position.setX(box.min.x + 1);
-        }
-
-        else if (this.position.x < box.min.x) {
+        } else if (this.position.x < box.min.x) {
             this.position.setX(box.max.x - 1);
         }
 
         if (this.position.z > box.max.z) {
             this.position.setZ(box.min.z + 1);
 
-        }
-        else if (this.position.z < box.min.z) {
+        } else if (this.position.z < box.min.z) {
             this.position.setZ(box.max.z - 1);
         }
 
         if (this.position.y > box.max.y) {
             this.position.setY(box.min.y + 1);
-        }
-
-        else if (this.position.y < box.min.y) {
+        } else if (this.position.y < box.min.y) {
             this.position.setY(box.max.y + 1);
         }
     },
@@ -405,8 +401,7 @@ SteeringEntity.prototype = Object.assign(Object.create(Entity.prototype), {
             if (this.pathIndex >= path.length - 1) {
                 if (loop)
                     this.pathIndex = 0;
-            }
-            else {
+            } else {
                 this.pathIndex++
             }
         }
@@ -424,8 +419,7 @@ SteeringEntity.prototype = Object.assign(Object.create(Entity.prototype), {
         var ahead2 = this.position.clone().add(this.velocity.clone().normalize().multiplyScalar(this.avoidDistance * .5));
         //get most threatening
         var mostThreatening = null;
-        for (var i = 0; i < obstacles.length; i++)
-        {
+        for (var i = 0; i < obstacles.length; i++) {
             if (obstacles[i] === this)
                 continue;
             var collision = obstacles[i].position.distanceTo(ahead) <= obstacles[i].radius || obstacles[i].position.distanceTo(ahead2) <= obstacles[i].radius
@@ -489,5 +483,4 @@ Object.defineProperty(THREE.Vector3.prototype, 'angle', {
 
 });
 
-
-
+export { Entity, SteeringEntity };
