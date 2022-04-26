@@ -14,9 +14,6 @@ let toneStartFlag = false;
 if (isMobile === false) {
     document.querySelector('main').addEventListener('click', async () => {
         if (toneStartFlag === false) {
-            await Tone.start()
-            console.log('audio is ready')
-            toneStartFlag = true;
             setup();
         }
     })
@@ -24,9 +21,6 @@ if (isMobile === false) {
 if (isMobile === true) {
     document.querySelector('main').addEventListener('ontouch', async () => {
         if (toneStartFlag === false) {
-            await Tone.start()
-            console.log('audio is ready')
-            toneStartFlag = true;
             setup();
         }
     })
@@ -36,7 +30,11 @@ let notes = ["D#4", "E#4", "G#4", "A#4", "C#4", "D#5", "E#5", "G#5", "A#5", "C#5
 const vocalSamples = [];
 var player;
 
-function setup() {
+async function setup() {
+    await Tone.start()
+    console.log('audio is ready')
+    toneStartFlag = true;
+
     const vocalSamples = new Tone.ToneAudioBuffers({
         happy1: "/media/voiceHappy/happy_1.mp3",
         happy2: "/media/voiceHappy/happy_2.mp3",
