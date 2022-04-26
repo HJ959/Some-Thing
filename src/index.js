@@ -126,8 +126,8 @@ importTexture('media/map_3.png', matThree);
 // Lights
 // white spotlight shining from the side, casting a shadow
 
-const spotLight = new THREE.SpotLight( 0xffffff );
-spotLight.position.set( 100, 1000, 100 );
+const spotLight = new THREE.SpotLight(0xffffff);
+spotLight.position.set(100, 1000, 100);
 
 spotLight.castShadow = true;
 
@@ -205,6 +205,7 @@ window.addEventListener('resize', () => {
 let touchEnergy = 0;
 let mousedownTime;
 let mouseDownFlag = false;
+let playPromise;
 
 if (isMobile === true) {
     // only play video when user interacts with piece to give movement
@@ -212,11 +213,15 @@ if (isMobile === true) {
     window.addEventListener('touchstart', () => {
         mousedownTime = new Date().getTime();
         mouseDownFlag = true;
-        mainVideo.play();
+        playPromise = mainVideo.play();
     })
     window.addEventListener('touchend', () => {
+        // stop the incrementing saturation
         mouseDownFlag = false;
-        mainVideo.pause();
+        // make sure there's something playing to pause
+        if (playPromise !== undefined) {
+            mainVideo.pause();
+        }
     })
 }
 if (isMobile === false) {
@@ -225,11 +230,15 @@ if (isMobile === false) {
     window.addEventListener('mousedown', () => {
         mousedownTime = new Date().getTime();
         mouseDownFlag = true;
-        mainVideo.play();
+        playPromise = mainVideo.play();
     })
     window.addEventListener('mouseup', () => {
+        // stop the incrementing saturation
         mouseDownFlag = false;
-        mainVideo.pause();
+        // make sure there's something playing to pause
+        if (playPromise !== undefined) {
+            mainVideo.pause();
+        }
     })
 }
 
@@ -274,7 +283,7 @@ const tick = () => {
     // if (mixer) {
     //     mixer.update( delta );
     // }
-    
+
     // Update Orbital Controls
     controls.update()
 
