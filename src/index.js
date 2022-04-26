@@ -38,7 +38,7 @@ const group = new THREE.Group();
 
 let something;
 let somethingLoadedFlag = false;
-let mixer, actions;
+let mixer, action;
 let floatAction, swimAction;
 
 // Load a glTF resource
@@ -49,7 +49,7 @@ loader.load(
     function (gltf) {
         scene.add(gltf.scene);
         mixer = new THREE.AnimationMixer(gltf.scene);
-        var action = mixer.clipAction(gltf.animations[0]);
+        action = mixer.clipAction(gltf.animations[0]);
         action.play();
 
         gltf.scene; // THREE.Group
@@ -138,7 +138,7 @@ spotLight.shadow.camera.near = 500;
 spotLight.shadow.camera.far = 4000;
 spotLight.shadow.camera.fov = 30;
 
-scene.add( spotLight );
+scene.add(spotLight);
 
 // Sizes
 const sizes = {
@@ -204,16 +204,18 @@ window.addEventListener('resize', () => {
 
 let touchEnergy = 0;
 let mousedownTime;
+let mouseDownFlag = false;
+
 if (isMobile === true) {
     // only play video when user interacts with piece to give movement
     const mainVideo = document.getElementById('mainVideo');
     window.addEventListener('touchstart', () => {
         mousedownTime = new Date().getTime();
+        mouseDownFlag = true;
         mainVideo.play();
     })
     window.addEventListener('touchend', () => {
-        const mouseupTime = new Date().getTime(),
-            timeDifference = mouseupTime - mousedownTime;
+        mouseDownFlag = false;
         mainVideo.pause();
     })
 }
@@ -222,13 +224,11 @@ if (isMobile === false) {
     const mainVideo = document.getElementById('mainVideo');
     window.addEventListener('mousedown', () => {
         mousedownTime = new Date().getTime();
+        mouseDownFlag = true;
         mainVideo.play();
     })
     window.addEventListener('mouseup', () => {
-        // figure out the time now the mouse is up
-        const mouseupTime = new Date().getTime(),
-            timeDifference = (mouseupTime - mousedownTime) * 0.5;
-        ENRGY.increaseEnergy(timeDifference);
+        mouseDownFlag = false;
         mainVideo.pause();
     })
 }
@@ -256,6 +256,12 @@ const tick = () => {
 
         canvas.style.filter = "saturate(" + currentEnergy * 0.001 + ") blur(" + (1000 - currentEnergy) * 0.001 + "px)";
     }
+    if (mouseDownFlag === true) {
+        // figure out the time now the mouse is up
+        const mouseupTime = new Date().getTime(),
+            timeDifference = (mouseupTime - mousedownTime) * 0.005;
+        ENRGY.increaseEnergy(timeDifference);
+    }
 
     const elapsedTime = clock.getElapsedTime();
 
@@ -264,9 +270,11 @@ const tick = () => {
         something.rotation.z = 0.1 * elapsedTime;
     }
 
-    var delta = clock.getDelta();
-    if ( mixer ) mixer.update( delta );
-
+    // var delta = clock.getDelta();
+    // if (mixer) {
+    //     mixer.update( delta );
+    // }
+    
     // Update Orbital Controls
     controls.update()
 
