@@ -278,7 +278,6 @@ const tick = () => {
         something.rotation.z += 0.001;
         meshDetails.rotation.z += 0.0001;
         meshOne.rotation.z -= 0.0001;
-        something.translateX = getRandomInt(-20,20);
     }
     
     delta = clock.getDelta()
