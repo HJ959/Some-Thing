@@ -7,7 +7,6 @@ import {
 import {
     GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader.js';
-// import { Entity, SteeringEntity } from './ThreeSteer.js';
 import {
     isMobile,
     getRandomInt,
@@ -33,26 +32,28 @@ scene.fog = new THREE.Fog(0x000000, 0.1, 20)
 // Instantiate a loader
 const loader = new GLTFLoader();
 
-// create a group 
-const group = new THREE.Group();
-
 let something;
 let somethingLoadedFlag = false;
-let mixer, action;
+let action, mixer, clips, clip;
 let floatAction, swimAction;
 
 // Load a glTF resource
 loader.load(
     // resource URL
-    'media/somethinganimation.glb',
+    'media/somethinganimation.gltf',
     // called when the resource is loaded
     function (gltf) {
         scene.add(gltf.scene);
+
+        // Create an AnimationMixer, and get the list of AnimationClip instances
         mixer = new THREE.AnimationMixer(gltf.scene);
-        action = mixer.clipAction(gltf.animations[0]);
+        clips = gltf.animations;
+
+        // Play a specific animation
+        clip = THREE.AnimationClip.findByName(clips, 'float');
+        action = mixer.clipAction(clip);
         action.play();
 
-        gltf.scene; // THREE.Group
         gltf.scene.name = "something"
         gltf.scene.castShadow = true;
         gltf.scene.scale.set(0.4, 0.4, 0.4);
@@ -63,7 +64,6 @@ loader.load(
         // grab the something once its loaded and mark as loaded
         something = scene.getObjectByName("something")
         somethingLoadedFlag = true;
-        // createSomething();
     },
     // called while loading is progressing
     function (xhr) {
@@ -246,6 +246,7 @@ const clock = new THREE.Clock();
 let saveCount = 0;
 let liveEnergyCounter = 0;
 let currentEnergy;
+let delta;
 
 const tick = () => {
     // every now and then during the session, store the time 
@@ -272,17 +273,18 @@ const tick = () => {
         ENRGY.increaseEnergy(timeDifference);
     }
 
-    const elapsedTime = clock.getElapsedTime();
-
     if (somethingLoadedFlag === true) {
-        something.rotation.x = 0.02 * elapsedTime;
-        something.rotation.z = 0.1 * elapsedTime;
+        something.rotation.x += 0.001;
+        something.rotation.z += 0.001;
+        meshDetails.rotation.z += 0.0001;
+        meshOne.rotation.z -= 0.0001;
+        something.translateX = getRandomInt(-20,20);
     }
-
-    // var delta = clock.getDelta();
-    // if (mixer) {
-    //     mixer.update( delta );
-    // }
+    
+    delta = clock.getDelta()
+    if (mixer) {  
+        mixer.update(delta);
+    }
 
     // Update Orbital Controls
     controls.update()
