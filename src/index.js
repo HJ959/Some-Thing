@@ -8,16 +8,21 @@ import {
     GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {
-    isMobile,
-    getRandomInt,
-    scale,
-    isEmpty
-} from './usefulFunctions.js';
+    SteeringEntity
+} from './three-steer';
+// import {
+//     isMobile,
+//     getRandomInt,
+//     scale,
+//     isEmpty
+// } from './usefulFunctions.js';
 import "./sound.js"
 import * as ENRGY from './energySystem.js'
 import "./css/normalise.css";
 import "./css/main.css";
 //////////////////////////////////////////////////////////////////////////////
+let entityManager, time, vehicle, target;
+
 // Canvas
 const canvas = document.getElementById('webgl');
 
@@ -44,6 +49,8 @@ loader.load(
     // called when the resource is loaded
     function (gltf) {
         scene.add(gltf.scene);
+        // let entity = new SteeringEntity(gltf.scene);
+        // scene.add(entity);
 
         // Create an AnimationMixer, and get the list of AnimationClip instances
         mixer = new THREE.AnimationMixer(gltf.scene);
@@ -207,40 +214,22 @@ let mousedownTime;
 let mouseDownFlag = false;
 let playPromise;
 
-if (isMobile === true) {
-    // only play video when user interacts with piece to give movement
-    const mainVideo = document.getElementById('mainVideo');
-    window.addEventListener('touchstart', () => {
-        mousedownTime = new Date().getTime();
-        mouseDownFlag = true;
-        playPromise = mainVideo.play();
-    })
-    window.addEventListener('touchend', () => {
-        // stop the incrementing saturation
-        mouseDownFlag = false;
-        // make sure there's something playing to pause
-        if (playPromise !== undefined) {
-            mainVideo.pause();
-        }
-    })
-}
-if (isMobile === false) {
-    // only play video when user interacts with piece to give movement
-    const mainVideo = document.getElementById('mainVideo');
-    window.addEventListener('mousedown', () => {
-        mousedownTime = new Date().getTime();
-        mouseDownFlag = true;
-        playPromise = mainVideo.play();
-    })
-    window.addEventListener('mouseup', () => {
-        // stop the incrementing saturation
-        mouseDownFlag = false;
-        // make sure there's something playing to pause
-        if (playPromise !== undefined) {
-            mainVideo.pause();
-        }
-    })
-}
+
+// only play video when user interacts with piece to give movement
+const mainVideo = document.getElementById('mainVideo');
+window.addEventListener('pointerdown', () => {
+    mousedownTime = new Date().getTime();
+    mouseDownFlag = true;
+    playPromise = mainVideo.play();
+})
+window.addEventListener('pointerup', () => {
+    // stop the incrementing saturation
+    mouseDownFlag = false;
+    // make sure there's something playing to pause
+    if (playPromise !== undefined) {
+        mainVideo.pause();
+    }
+})
 
 const clock = new THREE.Clock();
 let saveCount = 0;
@@ -279,11 +268,12 @@ const tick = () => {
         meshDetails.rotation.z += 0.0001;
         meshOne.rotation.z -= 0.0001;
     }
-    
+
     delta = clock.getDelta()
-    if (mixer) {  
+    if (mixer) {
         mixer.update(delta);
     }
+
 
     // Update Orbital Controls
     controls.update()
