@@ -18,11 +18,12 @@ window.addEventListener('pointerdown', () => {
     // if audio isn't setup then call the async function
     if (toneStartFlag === false) setup();
     // speed up if we move
-    if (toneStartFlag === true) Tone.Transport.bpm.rampTo(200, 0.1);
+    if (toneStartFlag === true) Tone.Transport.start(); Tone.Transport.bpm.rampTo(getRandomInt(120,180), 0.1);
 })
 window.addEventListener('pointerup', () => {
     // slow down when we stop
-    if (toneStartFlag === true) Tone.Transport.bpm.rampTo(0, 0.1);
+    // if (toneStartFlag === true) Tone.Transport.bpm.rampTo(0, 0.1);
+    if (toneStartFlag === true) Tone.Transport.pause();
 })
 
 async function setup() {
@@ -51,7 +52,7 @@ async function setup() {
     // create the pad
     const synthPad = new Tone.PolySynth().toDestination();
     // set the attributes across all the voices using 'set'
-    synth.set({
+    synthPad.set({
         detune: -1200,
         volume: -24
     });
@@ -59,7 +60,7 @@ async function setup() {
     const loop = new Tone.Loop((time) => {
         // triggered every eighth note.
         synth.triggerAttackRelease(notes[getRandomInt(0, notes.length)], 0.1);
-        synth.triggerAttackRelease(notes.slice(3, 6), 0.5);
+        synthPad.triggerAttackRelease(notes.slice(3, 6), 0.5);
 
     }, "8n", );
     loop.humanize = true;

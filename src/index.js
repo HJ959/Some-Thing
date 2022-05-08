@@ -141,7 +141,7 @@ spotLight.shadow.camera.fov = 30;
 scene.add(spotLight);
 
 // Sizes
-const sizes = {
+let sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
