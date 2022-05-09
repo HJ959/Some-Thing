@@ -11,6 +11,7 @@ import {
 let toneStartFlag = false;
 
 let notes = ["D#4", "E#4", "G#4", "A#4", "C#4", "D#5", "E#5", "G#5", "A#5", "C#5", "G#6", "A#6", "C#6"];
+const sampleNames = ["happy1", "happy2"];
 const vocalSamples = [];
 var player;
 
@@ -18,7 +19,7 @@ window.addEventListener('pointerdown', () => {
     // if audio isn't setup then call the async function
     if (toneStartFlag === false) setup();
     // speed up if we move
-    if (toneStartFlag === true) Tone.Transport.start(); Tone.Transport.bpm.rampTo(getRandomInt(120,180), 0.1);
+    if (toneStartFlag === true) Tone.Transport.start(); Tone.Transport.bpm.rampTo(getRandomInt(180,220), 0.1);
 })
 window.addEventListener('pointerup', () => {
     // slow down when we stop
@@ -37,7 +38,7 @@ async function setup() {
     }, () => {
         player = new Tone.Player().toDestination();
         // play one of the samples when they all load
-        player.buffer = vocalSamples.get("happy1");
+        player.buffer = vocalSamples.get(sampleNames[getRandomInt(0,sampleNames.length)]);
         player.start();
     });
 
@@ -49,18 +50,9 @@ async function setup() {
         volume: -12
     });
 
-    // create the pad
-    const synthPad = new Tone.PolySynth().toDestination();
-    // set the attributes across all the voices using 'set'
-    synthPad.set({
-        detune: -1200,
-        volume: -24
-    });
-
     const loop = new Tone.Loop((time) => {
         // triggered every eighth note.
-        synth.triggerAttackRelease(notes[getRandomInt(0, notes.length)], 0.1);
-        synthPad.triggerAttackRelease(notes.slice(3, 6), 0.5);
+        synth.triggerAttackRelease(notes[getRandomInt(0, notes.length)], 0.3);
 
     }, "8n", );
     loop.humanize = true;

@@ -11,12 +11,22 @@ Neee bother.
 Would love to hear how though!
 */
 
+// save the start time
+// this shouldn't live in here, but I feel
+// like it's easier to keep it here
+export function saveStartTime() {
+    if (checkIfStorage() === true) {
+        if (localStorage.getItem("startTime") === null) {
+            localStorage.setItem("startTime", String(Date.now()))
+        }
+    }
+}
+
 export function checkIfStorage() {
     if (storageAvailable('localStorage')) {
         // Yippee! We can use localStorage awesomeness
-        return(true);   
-    }
-    else {
+        return (true);
+    } else {
         alert("A storage feature is not available in your browser, the game will not work properly.");
         // Too bad, no localStorage for us
     }
@@ -30,8 +40,7 @@ export function initEnergy() {
             localStorage.setItem("energy", "1000");
         } else if (energyValue < 1000) {
             console.log("Energy level below 1000, keeping last known stats");
-        }
-        else {
+        } else {
             localStorage.setItem("energy", "0");
         }
     }
@@ -59,7 +68,7 @@ export function increaseEnergy(energyIncrease) {
 
 // to read
 export function readEnergy() {
-    if (checkIfStorage() === true) return(parseInt(localStorage.getItem('energy')));
+    if (checkIfStorage() === true) return (parseInt(localStorage.getItem('energy')));
 }
 
 // taken for the mozzila MDN site
@@ -71,18 +80,17 @@ export function storageAvailable(type) {
         storage.setItem(x, x);
         storage.removeItem(x);
         return true;
-    }
-    catch(e) {
+    } catch (e) {
         return e instanceof DOMException && (
-            // everything except Firefox
-            e.code === 22 ||
-            // Firefox
-            e.code === 1014 ||
-            // test name field too, because code might not be present
-            // everything except Firefox
-            e.name === 'QuotaExceededError' ||
-            // Firefox
-            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+                // everything except Firefox
+                e.code === 22 ||
+                // Firefox
+                e.code === 1014 ||
+                // test name field too, because code might not be present
+                // everything except Firefox
+                e.name === 'QuotaExceededError' ||
+                // Firefox
+                e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
             // acknowledge QuotaExceededError only if there's something already stored
             (storage && storage.length !== 0);
     }

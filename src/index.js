@@ -20,6 +20,7 @@ import "./sound.js"
 import * as ENRGY from './energySystem.js'
 import "./css/normalise.css";
 import "./css/main.css";
+import { getRandomInt } from './usefulFunctions';
 //////////////////////////////////////////////////////////////////////////////
 let entityManager, time, vehicle, target;
 
@@ -28,6 +29,7 @@ const canvas = document.getElementById('webgl');
 
 // init energy system
 ENRGY.initEnergy();
+ENRGY.saveStartTime();
 
 // Scene
 const scene = new THREE.Scene();
@@ -63,7 +65,10 @@ loader.load(
 
         gltf.scene.name = "something"
         gltf.scene.castShadow = true;
-        gltf.scene.scale.set(0.4, 0.4, 0.4);
+        gltf.scene.scale.set(0.6, 0.6, 0.6);
+        gltf.scene.translateX(getRandomInt(-2,2));
+        gltf.scene.translateZ(getRandomInt(-1,1));
+        gltf.scene.translateY(getRandomInt(-2,2));
         gltf.scenes; // Array<THREE.Group>
         gltf.cameras; // Array<THREE.Camera>
         gltf.asset; // Object
@@ -236,6 +241,7 @@ let saveCount = 0;
 let liveEnergyCounter = 0;
 let currentEnergy;
 let delta;
+let teleportCount = 0;
 
 const tick = () => {
     // every now and then during the session, store the time 
@@ -246,6 +252,18 @@ const tick = () => {
         saveCount = 0;
     }
     saveCount++;
+
+    // every now and then the something teleports
+    if (teleportCount % 3000 === 0) {
+        // save the time in local storage 
+        if (somethingLoadedFlag === true) {
+            something.position.x = (getRandomInt(-2,2));
+            something.position.y = (getRandomInt(-2,2));
+            something.position.z = (getRandomInt(-1,1));
+        }
+        teleportCount = 0;
+    }
+    teleportCount++;
 
     // gradually decrease the energy if its more than 0
     if (liveEnergyCounter % 1000000 === 0) {
