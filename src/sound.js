@@ -6,24 +6,40 @@ import * as Tone from 'tone'
 import {
     getRandomInt
 } from './usefulFunctions';
+import {
+    readEnergy
+} from './energySystem'
 
 //attach a click listener to a play button 
 let toneStartFlag = false;
 
 let notes = ["D#4", "E#4", "G#4", "A#4", "C#4", "D#5", "E#5", "G#5", "A#5", "C#5", "G#6", "A#6", "C#6"];
-const sampleNames = ["happy1", "happy2"];
-const vocalSamples = [];
-var player;
+export const happySampleNames = ["happy1", "happy2"];
+let firstTimeDown = true;
+export let synth, loop, player, vocalSamples, chorus;
 
 window.addEventListener('pointerdown', () => {
+    if (firstTimeDown === true) {
+        const show = document.getElementsByClassName("show");
+        const hide = document.getElementsByClassName("hide");
+        // once object loaded change the landing text
+        for (var i = 0; i < show.length; i++) {
+            show[i].style.display = "none";
+        }
+        for (var i = 0; i < hide.length; i++) {
+            hide[i].style.display = "block";
+        }
+    }
     // if audio isn't setup then call the async function
     if (toneStartFlag === false) setup();
     // speed up if we move
-    if (toneStartFlag === true) Tone.Transport.start(); Tone.Transport.bpm.rampTo(getRandomInt(180,220), 0.1);
+    if (toneStartFlag === true) {
+        Tone.Transport.start();
+        Tone.Transport.bpm.rampTo(getRandomInt(180, 220), 0.1);
+
+    }
 })
 window.addEventListener('pointerup', () => {
-    // slow down when we stop
-    // if (toneStartFlag === true) Tone.Transport.bpm.rampTo(0, 0.1);
     if (toneStartFlag === true) Tone.Transport.pause();
 })
 
@@ -32,31 +48,46 @@ async function setup() {
     console.log('audio is ready')
     toneStartFlag = true;
 
-    const vocalSamples = new Tone.ToneAudioBuffers({
+    // create chorus 
+    chorus = new Tone.Chorus({
+        "delayTime": 4,
+        "depth": 1,
+        "feedback": 0.3,
+        "spread": 180,
+        "wet": 0.6
+    }).toDestination().start();
+
+    vocalSamples = new Tone.ToneAudioBuffers({
         happy1: "/media/voiceHappy/happy_1.mp3",
         happy2: "/media/voiceHappy/happy_2.mp3",
     }, () => {
-        player = new Tone.Player().toDestination();
+        player = new Tone.Player().connect(chorus);
         // play one of the samples when they all load
-        player.buffer = vocalSamples.get(sampleNames[getRandomInt(0,sampleNames.length)]);
+        player.buffer = vocalSamples.get(happySampleNames[getRandomInt(0, happySampleNames.length)]);
         player.start();
     });
 
     // create the synth
-    const synth = new Tone.PolySynth().toDestination();
+    synth = new Tone.PolySynth().connect(chorus);
     // set the attributes across all the voices using 'set'
     synth.set({
         detune: -1200,
         volume: -12
     });
 
-    const loop = new Tone.Loop((time) => {
+    loop = new Tone.Loop((time) => {
         // triggered every eighth note.
-        synth.triggerAttackRelease(notes[getRandomInt(0, notes.length)], 0.3);
-
+        //synth.triggerAttackRelease(notes[getRandomInt(0, notes.length)], (getRandomInt(1,6)*0.1));
+        pattern();
     }, "8n", );
     loop.humanize = true;
     loop.start(0);
 
     Tone.Transport.start();
+}
+
+// gets called each loop
+function pattern() {
+    chorus.wet.value = Math.abs((1000 - readEnergy()) * 0.001);
+    synth.triggerAttackRelease(notes[getRandomInt(0, notes.length)], (getRandomInt(1, 150) * 0.01));
 }

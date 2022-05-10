@@ -19,10 +19,10 @@ body {
 
 .container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     grid-template-rows: 1fr;
     grid-template-areas:
-        "screen" "screen";
+        "screen";
 }
 
 .screen {
@@ -40,3 +40,47 @@ video {
     object-fit: cover;
     filter: blur(20px) saturate(1) contrast(1) brightness(1);
 }
+
+.textBoxes {
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 3fr 3fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-areas:
+        ". . . ."
+        ". topBox . ."
+        "middleBox . . ."
+        ". . . ."
+        ". . bottomBox .";
+    z-index: 3;
+    color: white;
+    font-size: 12vmin;
+}
+
+.topBox {
+    grid-area: topBox;
+}
+.middleBox {
+    grid-area: middleBox;
+}
+.bottomBox {
+    grid-area: bottomBox;
+}
+
+.show {
+    display:block;
+}
+.hide {
+    display: none;
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+  }

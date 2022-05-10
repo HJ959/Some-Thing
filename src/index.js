@@ -7,16 +7,16 @@ import {
 import {
     GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import {
-    SteeringEntity
-} from './three-steer';
+// import {
+//     SteeringEntity
+// } from './three-steer';
 // import {
 //     isMobile,
 //     getRandomInt,
 //     scale,
 //     isEmpty
 // } from './usefulFunctions.js';
-import "./sound.js"
+import * as SOUND from "./sound.js"
 import * as ENRGY from './energySystem.js'
 import "./css/normalise.css";
 import "./css/main.css";
@@ -86,12 +86,6 @@ loader.load(
         console.log('An error happened');
     }
 );
-
-function activateAllActions() {
-    actions.forEach(function (action) {
-        action.play();
-    });
-}
 
 const importTexture = async (url, material) => {
     const loader = new THREE.TextureLoader();
@@ -214,11 +208,9 @@ window.addEventListener('resize', () => {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 })
 
-let touchEnergy = 0;
 let mousedownTime;
 let mouseDownFlag = false;
 let playPromise;
-
 
 // only play video when user interacts with piece to give movement
 const mainVideo = document.getElementById('mainVideo');
@@ -242,8 +234,10 @@ let liveEnergyCounter = 0;
 let currentEnergy;
 let delta;
 let teleportCount = 0;
+let energy;
 
 const tick = () => {
+    energy = ENRGY.readEnergy();
     // every now and then during the session, store the time 
     // into a local storage var called lastseen
     if (saveCount % 300 === 0) {
@@ -254,12 +248,17 @@ const tick = () => {
     saveCount++;
 
     // every now and then the something teleports
-    if (teleportCount % 3000 === 0) {
-        // save the time in local storage 
+    if (teleportCount % parseInt(300) === 0) {
         if (somethingLoadedFlag === true) {
             something.position.x = (getRandomInt(-2,2));
             something.position.y = (getRandomInt(-2,2));
             something.position.z = (getRandomInt(-1,1));
+            
+            // if the something is happy play happy noises
+            if (energy > 700) {
+                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
+                SOUND.player.start();
+            }
         }
         teleportCount = 0;
     }
