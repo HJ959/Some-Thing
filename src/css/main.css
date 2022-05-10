@@ -42,22 +42,27 @@ video {
 }
 
 .textBoxes {
-    height: 100%;
-    width: 100%;
+    height: 100vh;
+    width: 100vmin;
     display: grid;
     grid-template-columns: 1fr 3fr 3fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas:
         ". . . ."
         ". topBox . ."
         "middleBox . . ."
         ". . . ."
-        ". . bottomBox .";
+        ". . bottomBox ."
+        ". detailsBox . .";
     z-index: 3;
     color: white;
-    font-size: 12vmin;
+    font-size: 9vmin;
 }
 
+.detailsBox {
+    grid-area: detailsBox;
+    font-size: 6vmin;
+}
 .topBox {
     grid-area: topBox;
 }
