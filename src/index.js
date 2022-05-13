@@ -234,10 +234,8 @@ let liveEnergyCounter = 0;
 let currentEnergy;
 let delta;
 let teleportCount = 0;
-let energy;
 
 const tick = () => {
-    energy = ENRGY.readEnergy();
     // every now and then during the session, store the time 
     // into a local storage var called lastseen
     if (saveCount % 300 === 0) {
@@ -255,7 +253,7 @@ const tick = () => {
             something.position.z = (getRandomInt(-1,1));
             
             // if the something is happy play happy noises
-            if (energy > 700) {
+            if (ENRGY.globalEnergy > 700) {
                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
                 SOUND.player.start();
             }
@@ -265,12 +263,12 @@ const tick = () => {
     teleportCount++;
 
     // gradually decrease the energy if its more than 0
-    if (liveEnergyCounter % 1000000 === 0) {
+    if (liveEnergyCounter % 100 === 0) {
         // decrease energy
-        currentEnergy = ENRGY.decreaseEnergy(1);
+        ENRGY.decreaseEnergy(1);
         liveEnergyCounter = 0;
 
-        canvas.style.filter = "saturate(" + currentEnergy * 0.001 + ") blur(" + (1000 - currentEnergy) * 0.001 + "px)";
+        canvas.style.filter = "brightness(" + ENRGY.globalEnergy * 0.001 + ") saturate(" + ENRGY.globalEnergy * 0.001 + ") blur(" + (1000 - ENRGY.globalEnergy) * 0.005 + "px)";
     }
     if (mouseDownFlag === true) {
         // figure out the time now the mouse is up

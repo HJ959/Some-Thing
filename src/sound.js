@@ -7,7 +7,7 @@ import {
     getRandomInt
 } from './usefulFunctions';
 import {
-    readEnergy
+    readEnergy, globalEnergy
 } from './energySystem'
 
 //attach a click listener to a play button 
@@ -47,6 +47,7 @@ async function setup() {
     await Tone.start()
     console.log('audio is ready')
     toneStartFlag = true;
+    Tone.Master.volume.value = -10
 
     // create chorus 
     chorus = new Tone.Chorus({
@@ -58,8 +59,8 @@ async function setup() {
     }).toDestination().start();
 
     vocalSamples = new Tone.ToneAudioBuffers({
-        happy1: "/media/voiceHappy/happy_1.mp3",
-        happy2: "/media/voiceHappy/happy_2.mp3",
+        happy1: "/media/voices/Happy/happy_1.mp3",
+        happy2: "/media/voices/Happy/happy_2.mp3",
     }, () => {
         player = new Tone.Player().connect(chorus);
         // play one of the samples when they all load
@@ -88,6 +89,7 @@ async function setup() {
 
 // gets called each loop
 function pattern() {
-    chorus.wet.value = Math.abs((1000 - readEnergy()) * 0.001);
-    synth.triggerAttackRelease(notes[getRandomInt(0, notes.length)], (getRandomInt(1, 150) * 0.01));
+    readEnergy();
+    chorus.wet.value = Math.abs((1000 - globalEnergy) * 0.001);
+    synth.triggerAttackRelease(notes[getRandomInt(0, notes.length)], (getRandomInt(1, 100) * 0.01));
 }

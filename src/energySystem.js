@@ -22,9 +22,16 @@ export function saveStartTime() {
     }
 }
 
+// variable to store the energy so I'm not constantly reading from
+// local storage, seemed to cause weird glitches on my pc that 
+// effected my laptop outside of the browser!?
+export let globalEnergy;
+export let storageAvailableFlag = false;
+
 export function checkIfStorage() {
     if (storageAvailable('localStorage')) {
         // Yippee! We can use localStorage awesomeness
+        storageAvailableFlag = true;
         return (true);
     } else {
         alert("A storage feature is not available in your browser, the game will not work properly.");
@@ -53,22 +60,31 @@ export function storeEnergy(energyLevel) {
 
 // to decrease
 export function decreaseEnergy(energyDecrease) {
-    var energy = readEnergy();
-    if (energy > 0) storeEnergy(energy - energyDecrease);
-    return energy;
+    readEnergy();
+    if (globalEnergy > 0) {
+        globalEnergy = globalEnergy - energyDecrease;
+        storeEnergy(globalEnergy);
+    }
 }
 
 // to increase
 export function increaseEnergy(energyIncrease) {
-    var energy = readEnergy();
-    if (energy + energyIncrease < 1000) storeEnergy(energy + energyIncrease);
-    if (energy + energyIncrease > 1000) storeEnergy(1000);
-    return energy;
+    readEnergy();
+    if (globalEnergy + energyIncrease < 1000) {
+        globalEnergy = globalEnergy + energyIncrease
+        storeEnergy(globalEnergy);
+    }
+    if (globalEnergy + energyIncrease > 1000) {
+        globalEnergy = 1000
+        storeEnergy(1000);
+    }
 }
 
 // to read
 export function readEnergy() {
-    if (checkIfStorage() === true) return (parseInt(localStorage.getItem('energy')));
+    if (storageAvailableFlag === true) {
+        globalEnergy = (parseInt(localStorage.getItem('energy')));
+    }
 }
 
 // taken for the mozzila MDN site
