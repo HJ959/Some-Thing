@@ -281,7 +281,7 @@ const tick = () => {
     saveCount++;
 
     // every now and then the something teleports
-    if (teleportCount % parseInt(300) === 0) {
+    if (teleportCount % parseInt(getRandomInt(200,300)) === 0) {
         if (somethingLoadedFlag === true) {
 
             target.position.x = (getRandomInt(-30, 30)*0.1);

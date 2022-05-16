@@ -18,6 +18,43 @@ export function saveStartTime() {
     if (checkIfStorage() === true) {
         if (localStorage.getItem("startTime") === null) {
             localStorage.setItem("startTime", String(Date.now()))
+        } else {
+            // taken from https://stackoverflow.com/questions/13903897/javascript-return-number-of-days-hours-minutes-seconds-between-two-dates/13904120#13904120
+            // get total seconds between the times
+            var delta = Math.abs(localStorage.getItem("lastSeen") - Date.now()) / 1000;
+
+            // calculate (and subtract) whole days
+            var days = Math.floor(delta / 86400);
+            delta -= days * 86400;
+
+            // calculate (and subtract) whole hours
+            var hours = Math.floor(delta / 3600) % 24;
+            delta -= hours * 3600;
+
+            // calculate (and subtract) whole minutes
+            var minutes = Math.floor(delta / 60) % 60;
+            delta -= minutes * 60;
+
+            // what's left is seconds
+            var seconds = delta % 60; // in theory the modulus is not required
+            if (days > 0) {
+                document.getElementById("daysSince").innerHTML = `${days} days since last visit`;
+            }
+            if (days === 0) {
+                if (hours > 0) {
+                    document.getElementById("daysSince").innerHTML = `${hours} hours since last visit`;
+                }
+                if (hours === 0) {
+                    if (minutes > 0) {
+                        document.getElementById("daysSince").innerHTML = `${minutes} minutes since last visit`;
+                    }
+                    if (minutes === 0) {
+                        if (seconds > 0) {
+                            document.getElementById("daysSince").innerHTML = `${seconds} seconds since last visit`;
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -84,7 +121,7 @@ export function increaseEnergy(energyIncrease) {
 export function readEnergy() {
     if (storageAvailableFlag === true) {
         globalEnergy = (parseInt(localStorage.getItem('energy')));
-        return(globalEnergy);
+        return (globalEnergy);
     }
 }
 

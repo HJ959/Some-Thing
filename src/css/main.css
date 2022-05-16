@@ -42,27 +42,29 @@ video {
 }
 
 .textBoxes {
-    height: 70vh;
-    width: 100vmin;
+    height: 95vmin;
+    width: 99vmax;
     display: grid;
-    grid-template-columns: 1fr 3fr 3fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 3fr 3fr 3fr 3fr 3fr 3fr 3fr 1fr;
     grid-template-areas:
-        ". . . ."
-        ". topBox . ."
-        "middleBox . . ."
-        ". . . ."
-        ". . bottomBox ."
-        ". detailsBox . ."
-        ". . . .";
+        ". . . . . ."
+        ". . topBox . . ."
+        ". middleBox . . . ."
+        ". . . bottomBox . ."
+        ". . . . . ."
+        ". . detailsBox . . ."
+        ". . . lucyBox . ."
+        ". daysSince . . . ."
+        ". . . . . .";
     z-index: 3;
     color: white;
-    font-size: 9vmin;
+    font-size: 7vmin;
 }
 
 .detailsBox {
     grid-area: detailsBox;
-    font-size: 6vmin;
+    font-size: 4vmin;
 }
 .topBox {
     grid-area: topBox;
@@ -72,6 +74,14 @@ video {
 }
 .bottomBox {
     grid-area: bottomBox;
+}
+.lucyBox {
+    grid-area: lucyBox;
+    font-size: 4vmin;
+}
+.daysSince {
+    grid-area: daysSince;
+    font-size: 3vmin;
 }
 
 .show {
