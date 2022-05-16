@@ -84,6 +84,7 @@ export function increaseEnergy(energyIncrease) {
 export function readEnergy() {
     if (storageAvailableFlag === true) {
         globalEnergy = (parseInt(localStorage.getItem('energy')));
+        return(globalEnergy);
     }
 }
 

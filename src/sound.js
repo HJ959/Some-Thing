@@ -47,7 +47,7 @@ async function setup() {
     await Tone.start()
     console.log('audio is ready')
     toneStartFlag = true;
-    Tone.Master.volume.value = -10
+    Tone.Destination.volume.value = -12
 
     // create chorus 
     chorus = new Tone.Chorus({

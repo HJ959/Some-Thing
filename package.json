@@ -16,7 +16,8 @@
   "license": "ISC",
   "dependencies": {
     "three": "^0.138.3",
-    "tone": "^14.7.77"
+    "tone": "^14.7.77",
+    "yuka": "github:Mugen87/yuka"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",

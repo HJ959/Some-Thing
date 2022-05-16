@@ -1,6 +1,7 @@
 "use strict";
 // Option 1: Import the entire three.js core library.
 import * as THREE from 'three';
+import * as YUKA from 'yuka';
 import {
     OrbitControls
 } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -20,9 +21,10 @@ import * as SOUND from "./sound.js"
 import * as ENRGY from './energySystem.js'
 import "./css/normalise.css";
 import "./css/main.css";
-import { getRandomInt } from './usefulFunctions';
+import {
+    getRandomInt
+} from './usefulFunctions';
 //////////////////////////////////////////////////////////////////////////////
-let entityManager, time, vehicle, target;
 
 // Canvas
 const canvas = document.getElementById('webgl');
@@ -33,8 +35,36 @@ ENRGY.saveStartTime();
 
 // Scene
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x000000, 0.1, 20)
+scene.fog = new THREE.Fog(0x000000, 0.6, 10)
 // scene.background = new THREE.Color(0x000000);
+
+const cubeGeo = new THREE.BoxGeometry();
+const cubeMat = new THREE.MeshBasicMaterial({
+    color: 0x00ff00
+});
+const targetMesh = new THREE.Mesh(cubeGeo, cubeMat);
+
+// create the YUKA objects for the something
+const entityManager = new YUKA.EntityManager();
+
+// create the target and vehicle
+const stVehicle = new YUKA.Vehicle();
+const target = new YUKA.GameEntity();
+target.setRenderComponent(targetMesh, sync);
+
+
+// create the seeking behaviour
+const seekBehaviour = new YUKA.SeekBehavior(target.position);
+stVehicle.steering.add(seekBehaviour);
+
+entityManager.add(stVehicle);
+entityManager.add(target);
+
+// function to sync the mesh and YUKA 
+function sync(entity, renderComponent) {
+    renderComponent.matrix.copy(entity.worldMatrix);
+}
+
 
 // Instantiate a loader
 const loader = new GLTFLoader();
@@ -51,24 +81,29 @@ loader.load(
     // called when the resource is loaded
     function (gltf) {
         scene.add(gltf.scene);
-        // let entity = new SteeringEntity(gltf.scene);
-        // scene.add(entity);
+
+        // disable for YUKA
+        gltf.scene.matrixAutoUpdate = false;
+
+        // moosh the YUKA 'soul' with the three 'body'
+        stVehicle.setRenderComponent(gltf.scene, sync);
 
         // Create an AnimationMixer, and get the list of AnimationClip instances
         mixer = new THREE.AnimationMixer(gltf.scene);
         clips = gltf.animations;
 
         // Play a specific animation
-        clip = THREE.AnimationClip.findByName(clips, 'float');
+        clip = THREE.AnimationClip.findByName(clips, 'swim');
         action = mixer.clipAction(clip);
         action.play();
 
         gltf.scene.name = "something"
         gltf.scene.castShadow = true;
         gltf.scene.scale.set(0.6, 0.6, 0.6);
-        gltf.scene.translateX(getRandomInt(-2,2));
-        gltf.scene.translateZ(getRandomInt(-1,1));
-        gltf.scene.translateY(getRandomInt(-2,2));
+        gltf.scene.rotation.y = Math.PI / 2;
+        gltf.scene.translateX(getRandomInt(-2, 2));
+        gltf.scene.translateZ(getRandomInt(-1, 1));
+        gltf.scene.translateY(getRandomInt(-2, 2));
         gltf.scenes; // Array<THREE.Group>
         gltf.cameras; // Array<THREE.Camera>
         gltf.asset; // Object
@@ -248,10 +283,11 @@ const tick = () => {
     // every now and then the something teleports
     if (teleportCount % parseInt(300) === 0) {
         if (somethingLoadedFlag === true) {
-            something.position.x = (getRandomInt(-2,2));
-            something.position.y = (getRandomInt(-2,2));
-            something.position.z = (getRandomInt(-1,1));
-            
+
+            target.position.x = (getRandomInt(-30, 30)*0.1);
+            target.position.y = (getRandomInt(-30, 30)*0.1);
+            target.position.z = (getRandomInt(-7, 7)*0.1);
+
             // if the something is happy play happy noises
             if (ENRGY.globalEnergy > 700) {
                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
@@ -278,8 +314,6 @@ const tick = () => {
     }
 
     if (somethingLoadedFlag === true) {
-        something.rotation.x += 0.001;
-        something.rotation.z += 0.001;
         meshDetails.rotation.z += 0.0001;
         meshOne.rotation.z -= 0.0001;
     }
@@ -288,6 +322,9 @@ const tick = () => {
     if (mixer) {
         mixer.update(delta);
     }
+
+    // const yDelta = yTime.update().getDelta();
+    entityManager.update(delta);
 
 
     // Update Orbital Controls
