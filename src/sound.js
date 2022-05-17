@@ -44,9 +44,9 @@ window.addEventListener('pointerdown', () => {
         for (var i = 0; i < hide.length; i++) {
             hide[i].style.display = "block";
         }
+        // if audio isn't setup then call the async function
+        if (toneStartFlag === false) setup();
     }
-    // if audio isn't setup then call the async function
-    if (toneStartFlag === false) setup();
     // speed up if we move
     if (toneStartFlag === true) {
         Tone.Transport.start();

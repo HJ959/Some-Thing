@@ -78,7 +78,6 @@ loader.load(
         gltf.cameras; // Array<THREE.Camera>
         gltf.asset; // Object
 
-
         // Create an AnimationMixer, and get the list of AnimationClip instances
         mixer = new THREE.AnimationMixer(gltf.scene);
         clips = gltf.animations;
@@ -331,9 +330,9 @@ const tick = () => {
         meshOne.rotation.z -= 0.0001;
 
         // if the target and vehicle are same pos chill
-        if ((Math.abs(target.position.x - stVehicle.position.x)*10 < 10)
-        && Math.abs(target.position.y - stVehicle.position.y)*10 < 10
-        && Math.abs(target.position.z - stVehicle.position.z)*10 < 10) {
+        if ((Math.abs(target.position.x - stVehicle.position.x) * 10 < 10) &&
+            Math.abs(target.position.y - stVehicle.position.y) * 10 < 10 &&
+            Math.abs(target.position.z - stVehicle.position.z) * 10 < 10) {
             target.position.x = (getRandomInt(-40, 40) * 0.1);
             target.position.y = (getRandomInt(-40, 40) * 0.1);
             target.position.z = (getRandomInt(-10, 7) * 0.1);
