@@ -7,14 +7,29 @@ import {
     getRandomInt
 } from './usefulFunctions';
 import {
-    readEnergy, globalEnergy
+    readEnergy,
+    globalEnergy
 } from './energySystem'
 
 //attach a click listener to a play button 
 let toneStartFlag = false;
 
 let notes = ["D#4", "E#4", "G#4", "A#4", "C#4", "D#5", "E#5", "G#5", "A#5", "C#5", "G#6", "A#6", "C#6"];
-export const happySampleNames = ["happy1", "happy2"];
+
+// these are the names of the various mp3s for use in dynamically creating objects
+export const happySampleNames = ["happy_1", "happy_2", "happy_3", "happy_4", "happy_5", "happy_6"];
+export const mediumHappySampleNames = ["mHappy_1", "mHappy_2", "mHappy_3"];
+export const mediumSampleNames = ["medium_1", "medium_2", "medium_3"];
+export const angrySampleNames = ["angry_1", "angry_2", "angry_3", "angry_4", "angry_5"];
+export const fedupSampleNames = ["fedup_1", "fedup_2", "fedup_3", "fedup_4", "fedup_5", "fedup_6"];
+let sampleLocations = {};
+const allSampleNames = [];
+allSampleNames.push(...happySampleNames, ...mediumHappySampleNames, ...mediumSampleNames, ...angrySampleNames, ...fedupSampleNames);
+
+for (var i = 0; i < allSampleNames.length; i++) {
+    sampleLocations[allSampleNames[i]] = `/media/voice_noises/${allSampleNames[i]}.mp3`
+}
+
 let firstTimeDown = true;
 export let synth, loop, player, vocalSamples, chorus;
 
@@ -58,15 +73,11 @@ async function setup() {
         "wet": 0.6
     }).toDestination().start();
 
-    vocalSamples = new Tone.ToneAudioBuffers({
-        happy1: "/media/voices/Happy/happy_1.mp3",
-        happy2: "/media/voices/Happy/happy_2.mp3",
-    }, () => {
-        player = new Tone.Player().connect(chorus);
-        // play one of the samples when they all load
-        player.buffer = vocalSamples.get(happySampleNames[getRandomInt(0, happySampleNames.length)]);
-        player.start();
-    });
+    vocalSamples = new Tone.ToneAudioBuffers(
+        sampleLocations,
+        () => {
+            player = new Tone.Player().connect(chorus);
+        });
 
     // create the synth
     synth = new Tone.PolySynth().connect(chorus);

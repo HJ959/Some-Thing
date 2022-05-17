@@ -8,15 +8,6 @@ import {
 import {
     GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader.js';
-// import {
-//     SteeringEntity
-// } from './three-steer';
-// import {
-//     isMobile,
-//     getRandomInt,
-//     scale,
-//     isEmpty
-// } from './usefulFunctions.js';
 import * as SOUND from "./sound.js"
 import * as ENRGY from './energySystem.js'
 import "./css/normalise.css";
@@ -52,7 +43,6 @@ const stVehicle = new YUKA.Vehicle();
 const target = new YUKA.GameEntity();
 target.setRenderComponent(targetMesh, sync);
 
-
 // create the seeking behaviour
 const seekBehaviour = new YUKA.SeekBehavior(target.position);
 stVehicle.steering.add(seekBehaviour);
@@ -71,8 +61,8 @@ const loader = new GLTFLoader();
 
 let something;
 let somethingLoadedFlag = false;
-let action, mixer, clips, clip;
-let floatAction, swimAction;
+let action, mixer, clips, swimClip, floatClip;
+let actionSwim, actionFloat;
 
 // Load a glTF resource
 loader.load(
@@ -82,35 +72,39 @@ loader.load(
     function (gltf) {
         scene.add(gltf.scene);
 
-        // disable for YUKA
-        gltf.scene.matrixAutoUpdate = false;
+        gltf.scene.name = "something"
+        gltf.scene.castShadow = true;
+        gltf.scenes; // Array<THREE.Group>
+        gltf.cameras; // Array<THREE.Camera>
+        gltf.asset; // Object
 
-        // moosh the YUKA 'soul' with the three 'body'
-        stVehicle.setRenderComponent(gltf.scene, sync);
 
         // Create an AnimationMixer, and get the list of AnimationClip instances
         mixer = new THREE.AnimationMixer(gltf.scene);
         clips = gltf.animations;
 
         // Play a specific animation
-        clip = THREE.AnimationClip.findByName(clips, 'swim');
-        action = mixer.clipAction(clip);
-        action.play();
-
-        gltf.scene.name = "something"
-        gltf.scene.castShadow = true;
-        gltf.scene.scale.set(0.6, 0.6, 0.6);
-        gltf.scene.rotation.y = Math.PI / 2;
-        gltf.scene.translateX(getRandomInt(-2, 2));
-        gltf.scene.translateZ(getRandomInt(-1, 1));
-        gltf.scene.translateY(getRandomInt(-2, 2));
-        gltf.scenes; // Array<THREE.Group>
-        gltf.cameras; // Array<THREE.Camera>
-        gltf.asset; // Object
+        swimClip = THREE.AnimationClip.findByName(clips, 'swim');
+        floatClip = THREE.AnimationClip.findByName(clips, 'float');
+        actionFloat = mixer.clipAction(floatClip);
+        actionSwim = mixer.clipAction(swimClip);
+        actionSwim.play();
 
         // grab the something once its loaded and mark as loaded
         something = scene.getObjectByName("something")
         somethingLoadedFlag = true;
+
+        // disable for YUKA
+        gltf.scene.matrixAutoUpdate = false;
+
+        // move to random first
+        target.position.x = (getRandomInt(-40, 40) * 0.1);
+        target.position.y = (getRandomInt(-40, 40) * 0.1);
+        target.position.z = (getRandomInt(-20, 7) * 0.1);
+
+
+        // moosh the YUKA 'soul' with the three 'body'
+        stVehicle.setRenderComponent(gltf.scene, sync);
     },
     // called while loading is progressing
     function (xhr) {
@@ -266,9 +260,9 @@ window.addEventListener('pointerup', () => {
 const clock = new THREE.Clock();
 let saveCount = 0;
 let liveEnergyCounter = 0;
-let currentEnergy;
 let delta;
 let teleportCount = 0;
+const triggerSpeakIntervals = [200, 100, 300, 400, 500, 600, 700];
 
 const tick = () => {
     // every now and then during the session, store the time 
@@ -281,16 +275,35 @@ const tick = () => {
     saveCount++;
 
     // every now and then the something teleports
-    if (teleportCount % parseInt(getRandomInt(200,300)) === 0) {
+    if (teleportCount % parseInt(triggerSpeakIntervals[getRandomInt(0, triggerSpeakIntervals.length)]) === 0) {
         if (somethingLoadedFlag === true) {
-
-            target.position.x = (getRandomInt(-30, 30)*0.1);
-            target.position.y = (getRandomInt(-30, 30)*0.1);
-            target.position.z = (getRandomInt(-7, 7)*0.1);
-
             // if the something is happy play happy noises
-            if (ENRGY.globalEnergy > 700) {
+            if (ENRGY.globalEnergy > 800) {
                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
+                SOUND.player.start();
+            }
+
+            // if the something is medium happy play medium happy noises
+            if (ENRGY.globalEnergy < 799 && ENRGY.globalEnergy > 600) {
+                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumHappySampleNames[getRandomInt(0, SOUND.mediumHappySampleNames.length)]);
+                SOUND.player.start();
+            }
+
+            // if the something is medium play medium noises
+            if (ENRGY.globalEnergy < 599 && ENRGY.globalEnergy > 400) {
+                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumSampleNames[getRandomInt(0, SOUND.mediumSampleNames.length)]);
+                SOUND.player.start();
+            }
+
+            // if the something is angry play angry noises
+            if (ENRGY.globalEnergy < 399 && ENRGY.globalEnergy > 200) {
+                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.angrySampleNames[getRandomInt(0, SOUND.angrySampleNames.length)]);
+                SOUND.player.start();
+            }
+
+            // if the something is fedup play fedup noises
+            if (ENRGY.globalEnergy < 199) {
+                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.fedupSampleNames[getRandomInt(0, SOUND.fedupSampleNames.length)]);
                 SOUND.player.start();
             }
         }
@@ -299,7 +312,7 @@ const tick = () => {
     teleportCount++;
 
     // gradually decrease the energy if its more than 0
-    if (liveEnergyCounter % 100 === 0) {
+    if (liveEnergyCounter % 10 === 0) {
         // decrease energy
         ENRGY.decreaseEnergy(1);
         liveEnergyCounter = 0;
@@ -316,6 +329,15 @@ const tick = () => {
     if (somethingLoadedFlag === true) {
         meshDetails.rotation.z += 0.0001;
         meshOne.rotation.z -= 0.0001;
+
+        // if the target and vehicle are same pos chill
+        if ((Math.abs(target.position.x - stVehicle.position.x)*10 < 10)
+        && Math.abs(target.position.y - stVehicle.position.y)*10 < 10
+        && Math.abs(target.position.z - stVehicle.position.z)*10 < 10) {
+            target.position.x = (getRandomInt(-40, 40) * 0.1);
+            target.position.y = (getRandomInt(-40, 40) * 0.1);
+            target.position.z = (getRandomInt(-10, 7) * 0.1);
+        }
     }
 
     delta = clock.getDelta()
