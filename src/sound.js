@@ -4,7 +4,8 @@
 // import tone
 import * as Tone from 'tone'
 import {
-    getRandomInt
+    getRandomInt,
+    isMobile
 } from './usefulFunctions';
 import {
     readEnergy,
@@ -35,7 +36,7 @@ export const sadSamples = ["sad_youvebeengonehours", "sad_wheredidyougoforhalfan
 export const normalConfusedSamples = ["normalConfused_trappedinnonsense", "normalConfused_icanfeelyourhand", "normalConfused_howdidigethere", "normalConfused_beenhereawhile"]
 export const normalSamples = ["normal_needyourhelp", "normal_lightdisolving", "normal_getback", "normal_dreamawake"]
 export const garbledSamples = ["garbled_wherkjer", "garbled_whereami", "garbled_lookinatme", "garbled_jgfkdj", "garbled_howdidiget", "garbled_hello", "garbled_bodyfeelstrange"]
-export const excitedSamples = ["excited_zapped", "excited_youfoundme", "excited_swimmingaround", "excited_suckedinmyphone", "excited_souldtrappedonweb", "excited_nextplace", "excited_litup", "excited_iwasasomething", "excited_iwasaperson", "excited_ithinkirememeber", "excited_iremember", "excited_imbeingpulled", "excited_imaspirit", "excited_folderintwo"]
+export const excitedSamples = ["excited_souldtrappedonweb", "excited_ithinkirememeber", "excited_suckedinmyphone", "excited_zapped", "excited_folderintwo", "excited_youfoundme", "excited_swimmingaround", "excited_iwasasomething", "excited_iwasaperson", "excited_imaspirit", "excited_iremember", "excited_nextplace", "excited_litup", "excited_imbeingpulled"]
 export const endSamples = ["end_thankyou", "end_imsplippinaway", "end_imfree", "end_byeeeee"]
 
 const allStorySampleNames = [];
@@ -61,6 +62,8 @@ window.addEventListener('pointerdown', () => {
         }
         // if audio isn't setup then call the async function
         if (toneStartFlag === false) setup();
+
+        firstTimeDown = false;
     }
     // speed up if we move
     if (toneStartFlag === true) {
@@ -76,7 +79,8 @@ window.addEventListener('pointerup', () => {
 async function setup() {
     await Tone.start()
     toneStartFlag = true;
-    Tone.Destination.volume.value = -6
+    if (isMobile === true) Tone.Destination.volume.value = -6
+    if (isMobile === false) Tone.Destination.volume.value = 0
 
     // create chorus 
     chorus = new Tone.Chorus({
@@ -100,12 +104,12 @@ async function setup() {
     // set the attributes across all the voices using 'set'
     synth.set({
         detune: -1200,
-        volume: -20
+        volume: -24
     });
 
     loop = new Tone.Loop((time) => {
         pattern();
-    }, "8n", );
+    }, "8n");
     loop.humanize = true;
     loop.start(0);
 

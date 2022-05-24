@@ -248,6 +248,13 @@ let delta;
 let teleportCount = 0;
 const triggerSpeakIntervals = [200, 100, 300, 400, 500, 600, 700];
 let secondsSinceStart;
+let iterateMainSamples = 0;
+let endSceneIterate = 0;
+let brightnessIterate = 0;
+let saturationIterate = 0;
+let blurIterate = 0;
+let endSceneFlag = false;
+
 const tick = () => {
     // every now and then during the session, store the time 
     // into a local storage var called lastseen
@@ -262,35 +269,69 @@ const tick = () => {
     if (teleportCount % parseInt(triggerSpeakIntervals[getRandomInt(0, triggerSpeakIntervals.length)]) === 0) {
         // read the time for working out when speaking should happen
         secondsSinceStart = returnTime();
+        console.log(secondsSinceStart)
         if (somethingLoadedFlag === true && SOUND.toneStartFlag === true) {
-            // if the something is happy play happy noises
-            if (ENRGY.globalEnergy > 800) {
-                if (secondsSinceStart < 60) SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
-                if (secondsSinceStart > 60) SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.garbledSamples[getRandomInt(0, SOUND.garbledSamples.length)]);
+            if (SOUND.player.state == "stopped") {
+                // if the something is happy play happy noises
+                if (ENRGY.globalEnergy > 800) {
+                    if (secondsSinceStart < 60) {
+                        SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
+                    }
+                    if (secondsSinceStart > 60) {
+                        if (SOUND.garbledSamples.length > 0) {
+                            var tmpRandom = getRandomInt(0, SOUND.garbledSamples.length);
+                            SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.garbledSamples[tmpRandom]);
+                            SOUND.garbledSamples.splice(tmpRandom, 1);
+                        }
+                    }
+                    if (secondsSinceStart > 120) {
+                        if (SOUND.normalConfusedSamples.length > 0) {
+                            var tmpRandom = getRandomInt(0, SOUND.normalConfusedSamples.length);
+                            SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalConfusedSamples[tmpRandom]);
+                            SOUND.normalConfusedSamples.splice(tmpRandom, 1);
+                        }
+                    }
+                    if (secondsSinceStart > 150) {
+                        if (SOUND.normalSamples.length > 0) {
+                            var tmpRandom = getRandomInt(0, SOUND.normalSamples.length);
+                            SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalSamples[tmpRandom]);
+                            SOUND.normalSamples.splice(tmpRandom, 1);
+                        }
+                    }
+                    if (secondsSinceStart > 240) {
+                        if (iterateMainSamples === SOUND.excitedSamples.length) {
+                            // play end scene
+                            console.log("END SCENE");
+                            endSceneFlag = true;
+                        } else if (iterateMainSamples < SOUND.excitedSamples.length) {
+                            SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.excitedSamples[iterateMainSamples]);
+                            iterateMainSamples++;
+                        }
+                    }
+                }
 
+                // if the something is medium happy play medium happy noises
+                else if (ENRGY.globalEnergy < 799 && ENRGY.globalEnergy > 600) {
+                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumHappySampleNames[getRandomInt(0, SOUND.mediumHappySampleNames.length)]);
+                }
+
+                // if the something is medium play medium noises
+                else if (ENRGY.globalEnergy < 599 && ENRGY.globalEnergy > 400) {
+                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumSampleNames[getRandomInt(0, SOUND.mediumSampleNames.length)]);
+                }
+
+                // if the something is angry play angry noises
+                else if (ENRGY.globalEnergy < 399 && ENRGY.globalEnergy > 200) {
+                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.angrySampleNames[getRandomInt(0, SOUND.angrySampleNames.length)]);
+                }
+
+                // if the something is fedup play fedup noises
+                else if (ENRGY.globalEnergy < 199) {
+                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.fedupSampleNames[getRandomInt(0, SOUND.fedupSampleNames.length)]);
+                }
+
+                if (endSceneFlag === false) SOUND.player.start();
             }
-
-            // if the something is medium happy play medium happy noises
-            if (ENRGY.globalEnergy < 799 && ENRGY.globalEnergy > 600) {
-                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumHappySampleNames[getRandomInt(0, SOUND.mediumHappySampleNames.length)]);
-            }
-
-            // if the something is medium play medium noises
-            if (ENRGY.globalEnergy < 599 && ENRGY.globalEnergy > 400) {
-                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumSampleNames[getRandomInt(0, SOUND.mediumSampleNames.length)]);
-            }
-
-            // if the something is angry play angry noises
-            if (ENRGY.globalEnergy < 399 && ENRGY.globalEnergy > 200) {
-                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.angrySampleNames[getRandomInt(0, SOUND.angrySampleNames.length)]);
-            }
-
-            // if the something is fedup play fedup noises
-            if (ENRGY.globalEnergy < 199) {
-                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.fedupSampleNames[getRandomInt(0, SOUND.fedupSampleNames.length)]);
-            }
-
-            SOUND.player.start();
         }
         teleportCount = 0;
     }
@@ -302,7 +343,7 @@ const tick = () => {
         ENRGY.decreaseEnergy(1);
         liveEnergyCounter = 0;
 
-        canvas.style.filter = "brightness(" + ENRGY.globalEnergy * 0.001 + ") saturate(" + ENRGY.globalEnergy * 0.001 + ") blur(" + (1000 - ENRGY.globalEnergy) * 0.005 + "px)";
+        if (endSceneFlag === false) canvas.style.filter = "brightness(" + ENRGY.globalEnergy * 0.001 + ") saturate(" + ENRGY.globalEnergy * 0.001 + ") blur(" + (1000 - ENRGY.globalEnergy) * 0.005 + "px)";
     }
     if (mouseDownFlag === true) {
         // figure out the time now the mouse is up
@@ -312,8 +353,38 @@ const tick = () => {
     }
 
     if (somethingLoadedFlag === true) {
-        meshDetails.rotation.z += 0.0001;
-        meshOne.rotation.z -= 0.0001;
+        if (endSceneFlag === true && SOUND.toneStartFlag === true) {
+            meshDetails.rotation.z += 0.01;
+            meshOne.rotation.z -= 0.01;
+            canvas.style.filter = `brightness(${brightnessIterate}) saturate(${saturationIterate}) blur(${blurIterate}px)`;
+            brightnessIterate += 0.01;
+            saturationIterate += 0.01;
+            blurIterate += 0.01;
+            if (SOUND.player.state === "stopped") {
+                if (iterateMainSamples < SOUND.endSamples.length) {
+                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.endSamples[iterateMainSamples]);
+                    iterateMainSamples++;
+                    SOUND.player.start();
+                }
+                if (iterateMainSamples === SOUND.endSamples.length) {
+                    const show = document.getElementsByClassName("show");
+                    const hide = document.getElementsByClassName("hide");
+                    // once object loaded change the landing text
+                    for (var i = 0; i < show.length; i++) {
+                        show[i].style.display = "block";
+                    }
+                    for (var i = 0; i < hide.length; i++) {
+                        hide[i].style.display = "none";
+                    }
+                    while(scene.children.length > 0){ 
+                        scene.remove(scene.children[0]); 
+                    }
+                }
+            }
+        } else {
+            meshDetails.rotation.z += 0.0001;
+            meshOne.rotation.z -= 0.0001;
+        }
 
         // if the target and vehicle are same pos chill
         if ((Math.abs(target.position.x - stVehicle.position.x) * 10 < 10) &&
