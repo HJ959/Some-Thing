@@ -230,14 +230,14 @@ const mainVideo = document.getElementById('mainVideo');
 window.addEventListener('pointerdown', () => {
     mousedownTime = new Date().getTime();
     mouseDownFlag = true;
-    playPromise = mainVideo.play();
+    if (SOUND.toneStartFlag === true) playPromise = mainVideo.play();
 })
 window.addEventListener('pointerup', () => {
     // stop the incrementing saturation
     mouseDownFlag = false;
     // make sure there's something playing to pause
     if (playPromise !== undefined) {
-        mainVideo.pause();
+        if (SOUND.toneStartFlag === true) mainVideo.pause();
     }
 })
 
