@@ -26,8 +26,6 @@ ENRGY.saveStartTime();
 
 // Scene
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x000000, 0.6, 10)
-// scene.background = new THREE.Color(0x000000);
 
 const cubeGeo = new THREE.BoxGeometry();
 const cubeMat = new THREE.MeshBasicMaterial({
@@ -157,22 +155,9 @@ importTexture('media/map_1.png', matOne);
 importTexture('media/map_2.png', matTwo);
 importTexture('media/map_3.png', matThree);
 
-// Lights
-// white spotlight shining from the side, casting a shadow
-
-const spotLight = new THREE.SpotLight(0xffffff);
-spotLight.position.set(100, 1000, 100);
-
-spotLight.castShadow = true;
-
-spotLight.shadow.mapSize.width = 1024;
-spotLight.shadow.mapSize.height = 1024;
-
-spotLight.shadow.camera.near = 500;
-spotLight.shadow.camera.far = 4000;
-spotLight.shadow.camera.fov = 30;
-
-scene.add(spotLight);
+// White directional light at half intensity shining from the top.
+const directionalLight = new THREE.DirectionalLight(0x76a0cf, 1);
+scene.add(directionalLight);
 
 // Sizes
 let sizes = {
@@ -191,7 +176,7 @@ const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.enableZoom = true;
-controls.maxDistance = 2.5;
+controls.maxDistance = 3.5;
 controls.minDistance = 1;
 
 // set up the controls, which buttons and touches do what
@@ -204,7 +189,7 @@ const renderer = new THREE.WebGLRenderer({
     alpha: true,
     antialias: true
 });
-renderer.setClearColor(0x000000, 0); // the default
+// renderer.setClearColor(0x000000, 0); // the default
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -262,7 +247,7 @@ let liveEnergyCounter = 0;
 let delta;
 let teleportCount = 0;
 const triggerSpeakIntervals = [200, 100, 300, 400, 500, 600, 700];
-
+let secondsSinceStart;
 const tick = () => {
     // every now and then during the session, store the time 
     // into a local storage var called lastseen
@@ -275,36 +260,37 @@ const tick = () => {
 
     // every now and then the something teleports
     if (teleportCount % parseInt(triggerSpeakIntervals[getRandomInt(0, triggerSpeakIntervals.length)]) === 0) {
-        if (somethingLoadedFlag === true) {
+        // read the time for working out when speaking should happen
+        secondsSinceStart = returnTime();
+        if (somethingLoadedFlag === true && SOUND.toneStartFlag === true) {
             // if the something is happy play happy noises
             if (ENRGY.globalEnergy > 800) {
-                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
-                SOUND.player.start();
+                if (secondsSinceStart < 60) SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
+                if (secondsSinceStart > 60) SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.garbledSamples[getRandomInt(0, SOUND.garbledSamples.length)]);
+
             }
 
             // if the something is medium happy play medium happy noises
             if (ENRGY.globalEnergy < 799 && ENRGY.globalEnergy > 600) {
                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumHappySampleNames[getRandomInt(0, SOUND.mediumHappySampleNames.length)]);
-                SOUND.player.start();
             }
 
             // if the something is medium play medium noises
             if (ENRGY.globalEnergy < 599 && ENRGY.globalEnergy > 400) {
                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumSampleNames[getRandomInt(0, SOUND.mediumSampleNames.length)]);
-                SOUND.player.start();
             }
 
             // if the something is angry play angry noises
             if (ENRGY.globalEnergy < 399 && ENRGY.globalEnergy > 200) {
                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.angrySampleNames[getRandomInt(0, SOUND.angrySampleNames.length)]);
-                SOUND.player.start();
             }
 
             // if the something is fedup play fedup noises
             if (ENRGY.globalEnergy < 199) {
                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.fedupSampleNames[getRandomInt(0, SOUND.fedupSampleNames.length)]);
-                SOUND.player.start();
             }
+
+            SOUND.player.start();
         }
         teleportCount = 0;
     }
@@ -358,3 +344,9 @@ const tick = () => {
     window.requestAnimationFrame(tick);
 }
 tick();
+
+
+//// function for working out time
+function returnTime() {
+    return (Math.abs((localStorage.getItem("startTime") - Date.now()) / 1000))
+}

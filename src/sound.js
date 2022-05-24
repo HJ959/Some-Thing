@@ -11,10 +11,10 @@ import {
     globalEnergy
 } from './energySystem'
 
-//attach a click listener to a play button 
-let toneStartFlag = false;
+// has tonestarted?
+export let toneStartFlag = false;
 
-let notes = ["D#4", "E#4", "G#4", "A#4", "C#4", "D#5", "E#5", "G#5", "A#5", "C#5", "G#6", "A#6", "C#6"];
+let notes = ["D#4", "E#4", "G#4", "A#4", "C#4", "D#5", "E#5", "G#5", "A#5", "C#5", "G#6", "A#6", "C#6", 'F4', 'G4', "G5", "A5", "C5", "G6", "A6", "C6", "G4", "A4", "C4", "D5"];
 
 // these are the names of the various mp3s for use in dynamically creating objects
 export const happySampleNames = ["happy_1", "happy_2", "happy_3", "happy_4", "happy_5", "happy_6"];
@@ -28,6 +28,21 @@ allSampleNames.push(...happySampleNames, ...mediumHappySampleNames, ...mediumSam
 
 for (var i = 0; i < allSampleNames.length; i++) {
     sampleLocations[allSampleNames[i]] = `/media/voice_noises/${allSampleNames[i]}.mp3`
+}
+
+// story assets file names
+export const sadSamples = ["sad_youvebeengonehours", "sad_wheredidyougoforhalfanhour", "sad_howmanydays", "sad_darkwhenleave"]
+export const normalConfusedSamples = ["normalConfused_trappedinnonsense", "normalConfused_icanfeelyourhand", "normalConfused_howdidigethere", "normalConfused_beenhereawhile"]
+export const normalSamples = ["normal_needyourhelp", "normal_lightdisolving", "normal_getback", "normal_dreamawake"]
+export const garbledSamples = ["garbled_wherkjer", "garbled_whereami", "garbled_lookinatme", "garbled_jgfkdj", "garbled_howdidiget", "garbled_hello", "garbled_bodyfeelstrange"]
+export const excitedSamples = ["excited_zapped", "excited_youfoundme", "excited_swimmingaround", "excited_suckedinmyphone", "excited_souldtrappedonweb", "excited_nextplace", "excited_litup", "excited_iwasasomething", "excited_iwasaperson", "excited_ithinkirememeber", "excited_iremember", "excited_imbeingpulled", "excited_imaspirit", "excited_folderintwo"]
+export const endSamples = ["end_thankyou", "end_imsplippinaway", "end_imfree", "end_byeeeee"]
+
+const allStorySampleNames = [];
+allStorySampleNames.push(...sadSamples, ...normalConfusedSamples, ...normalSamples, ...garbledSamples, ...excitedSamples, ...endSamples);
+
+for (var i = 0; i < allStorySampleNames.length; i++) {
+    sampleLocations[allStorySampleNames[i]] = `/media/storyAssets/${allStorySampleNames[i]}.mp3`
 }
 
 let firstTimeDown = true;
@@ -60,9 +75,8 @@ window.addEventListener('pointerup', () => {
 
 async function setup() {
     await Tone.start()
-    console.log('audio is ready')
     toneStartFlag = true;
-    Tone.Destination.volume.value = -12
+    Tone.Destination.volume.value = -6
 
     // create chorus 
     chorus = new Tone.Chorus({
@@ -76,7 +90,9 @@ async function setup() {
     vocalSamples = new Tone.ToneAudioBuffers(
         sampleLocations,
         () => {
-            player = new Tone.Player().connect(chorus);
+            player = new Tone.Player({
+                volume: -6
+            }).connect(chorus);
         });
 
     // create the synth
@@ -84,12 +100,10 @@ async function setup() {
     // set the attributes across all the voices using 'set'
     synth.set({
         detune: -1200,
-        volume: -12
+        volume: -20
     });
 
     loop = new Tone.Loop((time) => {
-        // triggered every eighth note.
-        //synth.triggerAttackRelease(notes[getRandomInt(0, notes.length)], (getRandomInt(1,6)*0.1));
         pattern();
     }, "8n", );
     loop.humanize = true;
@@ -98,9 +112,20 @@ async function setup() {
     Tone.Transport.start();
 }
 
+let notesToPlay;
 // gets called each loop
 function pattern() {
     readEnergy();
     chorus.wet.value = Math.abs((1000 - globalEnergy) * 0.001);
-    synth.triggerAttackRelease(notes[getRandomInt(0, notes.length)], (getRandomInt(1, 100) * 0.01));
+
+    // if all happy play only the notes that sound happy
+    if (globalEnergy > 800) notesToPlay = 12;
+
+    // then start slipping in more not nice notes
+    if (globalEnergy < 799 && globalEnergy > 600) notesToPlay = 16;
+    if (globalEnergy < 599 && globalEnergy > 400) notesToPlay = 18;
+    if (globalEnergy < 399 && globalEnergy > 200) notesToPlay = 20;
+    if (globalEnergy < 199) notesToPlay = notes.length;
+
+    synth.triggerAttackRelease(notes[getRandomInt(0, notesToPlay)], (getRandomInt(1, 100) * 0.01));
 }
