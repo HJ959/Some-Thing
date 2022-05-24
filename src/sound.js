@@ -70,7 +70,6 @@ window.addEventListener('pointerdown', () => {
     if (toneStartFlag === true) {
         Tone.Transport.start();
         Tone.Transport.bpm.rampTo(getRandomInt(180, 220), 0.1);
-
     }
 })
 window.addEventListener('pointerup', () => {
@@ -83,10 +82,6 @@ async function setup() {
 }
 
 function createAudioElements() {
-    
-    if (isMobile === true) Tone.Destination.volume.value = -6
-    if (isMobile === false) Tone.Destination.volume.value = 0
-
     // create chorus 
     chorus = new Tone.Chorus({
         "delayTime": 4,
