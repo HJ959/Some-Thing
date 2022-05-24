@@ -61,7 +61,7 @@ window.addEventListener('pointerdown', () => {
             hide[i].style.display = "block";
         }
         firstTimeDown = false;
-        
+
         // if audio isn't setup then call the async function
         if (toneStartFlag === false) setup();
 
@@ -79,7 +79,6 @@ window.addEventListener('pointerup', () => {
 
 async function setup() {
     await Tone.start()
-    toneStartFlag = true;
     if (isMobile === true) Tone.Destination.volume.value = -6
     if (isMobile === false) Tone.Destination.volume.value = 0
 
@@ -115,6 +114,7 @@ async function setup() {
     loop.start(0);
 
     Tone.Transport.start();
+    toneStartFlag = true;
 }
 
 let notesToPlay;
