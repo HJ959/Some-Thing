@@ -271,7 +271,7 @@ const tick = () => {
         secondsSinceStart = returnTime();
         console.log(secondsSinceStart)
         if (somethingLoadedFlag === true && SOUND.toneStartFlag === true) {
-            if (SOUND.player.state == "stopped") {
+            if (SOUND.player.state === "stopped") {
                 // if the something is happy play happy noises
                 if (ENRGY.globalEnergy > 800) {
                     if (secondsSinceStart < 60) {
