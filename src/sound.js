@@ -78,7 +78,12 @@ window.addEventListener('pointerup', () => {
 })
 
 async function setup() {
-    await Tone.start()
+    await Tone.start();
+    createAudioElements();
+}
+
+function createAudioElements() {
+    
     if (isMobile === true) Tone.Destination.volume.value = -6
     if (isMobile === false) Tone.Destination.volume.value = 0
 
