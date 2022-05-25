@@ -49,7 +49,8 @@ for (var i = 0; i < allStorySampleNames.length; i++) {
 let firstTimeDown = true;
 export let synth, loop, player, vocalSamples, chorus;
 
-window.addEventListener('pointerdown', () => {
+
+function handlePointerDown() {
     if (firstTimeDown === true) {
         const show = document.getElementsByClassName("show");
         const hide = document.getElementsByClassName("hide");
@@ -71,10 +72,15 @@ window.addEventListener('pointerdown', () => {
         Tone.Transport.start();
         Tone.Transport.bpm.rampTo(getRandomInt(180, 220), 0.1);
     }
-})
-window.addEventListener('pointerup', () => {
+}
+document.addEventListener('pointerdown', handlePointerDown);
+// document.removeEventListener('pointerdown', handlePointerDown);
+
+function handlePointerUp() {
     if (toneStartFlag === true) Tone.Transport.pause();
-})
+}
+document.addEventListener('pointerup', handlePointerUp);
+// document.removeEventListener('pointerup', handlePointerUp);
 
 async function setup() {
     await Tone.start();

@@ -227,12 +227,12 @@ let playPromise;
 
 // only play video when user interacts with piece to give movement
 const mainVideo = document.getElementById('mainVideo');
-window.addEventListener('pointerdown', () => {
+document.addEventListener('pointerdown', () => {
     mousedownTime = new Date().getTime();
     mouseDownFlag = true;
     if (SOUND.toneStartFlag === true) playPromise = mainVideo.play();
 })
-window.addEventListener('pointerup', () => {
+document.addEventListener('pointerup', () => {
     // stop the incrementing saturation
     mouseDownFlag = false;
     // make sure there's something playing to pause
