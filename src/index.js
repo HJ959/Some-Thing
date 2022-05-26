@@ -176,8 +176,10 @@ const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.enableZoom = true;
-controls.maxDistance = 3.5;
+controls.maxDistance = 4;
 controls.minDistance = 1;
+controls.enableRotate = false;
+
 
 // set up the controls, which buttons and touches do what
 controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
@@ -195,15 +197,25 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // this bit sets up boundaries for the pan, effectively 
 // creating the edges of the 'map'
-var minPan = new THREE.Vector3(-4, -4, -4);
-var maxPan = new THREE.Vector3(4, 4, 4);
+var minPan = new THREE.Vector3(-3, -3, -3);
+var maxPan = new THREE.Vector3(3, 3, 3);
 var _v = new THREE.Vector3();
-controls.addEventListener("change", function () {
-    _v.copy(controls.target);
-    controls.target.clamp(minPan, maxPan);
-    _v.sub(controls.target);
-    camera.position.sub(_v);
-})
+// controls.addEventListener("change", function () {
+//     _v.copy(controls.target);
+//     controls.target.clamp(minPan, maxPan);
+//     _v.sub(controls.target);
+//     camera.position.sub(_v);
+// })
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
+function onPointerMove(event) {
+    // calculate pointer position in normalized device coordinates
+    // (-1 to +1) for both components
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
 
 
 // keep the same size even if window is resized
@@ -249,7 +261,7 @@ let teleportCount = 0;
 const triggerSpeakIntervals = [200, 100, 300, 400, 500, 600, 700];
 let secondsSinceStart;
 let iterateMainSamples = 0;
-let endSceneIterate = 0;
+let iterateEndSamples = 0;
 let brightnessIterate = 0;
 let saturationIterate = 0;
 let blurIterate = 0;
@@ -264,78 +276,6 @@ const tick = () => {
         saveCount = 0;
     }
     saveCount++;
-
-    // every now and then the something teleports
-    if (teleportCount % parseInt(triggerSpeakIntervals[getRandomInt(0, triggerSpeakIntervals.length)]) === 0) {
-        // read the time for working out when speaking should happen
-        secondsSinceStart = returnTime();
-        console.log(secondsSinceStart)
-        if (somethingLoadedFlag === true && SOUND.toneStartFlag === true) {
-            if (SOUND.player.state === "stopped") {
-                // if the something is happy play happy noises
-                if (ENRGY.globalEnergy > 800) {
-                    if (secondsSinceStart < 60) {
-                        SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
-                    }
-                    if (secondsSinceStart > 60) {
-                        if (SOUND.garbledSamples.length > 0) {
-                            var tmpRandom = getRandomInt(0, SOUND.garbledSamples.length);
-                            SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.garbledSamples[tmpRandom]);
-                            SOUND.garbledSamples.splice(tmpRandom, 1);
-                        }
-                    }
-                    if (secondsSinceStart > 120) {
-                        if (SOUND.normalConfusedSamples.length > 0) {
-                            var tmpRandom = getRandomInt(0, SOUND.normalConfusedSamples.length);
-                            SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalConfusedSamples[tmpRandom]);
-                            SOUND.normalConfusedSamples.splice(tmpRandom, 1);
-                        }
-                    }
-                    if (secondsSinceStart > 150) {
-                        if (SOUND.normalSamples.length > 0) {
-                            var tmpRandom = getRandomInt(0, SOUND.normalSamples.length);
-                            SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalSamples[tmpRandom]);
-                            SOUND.normalSamples.splice(tmpRandom, 1);
-                        }
-                    }
-                    if (secondsSinceStart > 240) {
-                        if (iterateMainSamples === SOUND.excitedSamples.length) {
-                            // play end scene
-                            console.log("END SCENE");
-                            endSceneFlag = true;
-                        } else if (iterateMainSamples < SOUND.excitedSamples.length) {
-                            SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.excitedSamples[iterateMainSamples]);
-                            iterateMainSamples++;
-                        }
-                    }
-                }
-
-                // if the something is medium happy play medium happy noises
-                else if (ENRGY.globalEnergy < 799 && ENRGY.globalEnergy > 600) {
-                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumHappySampleNames[getRandomInt(0, SOUND.mediumHappySampleNames.length)]);
-                }
-
-                // if the something is medium play medium noises
-                else if (ENRGY.globalEnergy < 599 && ENRGY.globalEnergy > 400) {
-                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumSampleNames[getRandomInt(0, SOUND.mediumSampleNames.length)]);
-                }
-
-                // if the something is angry play angry noises
-                else if (ENRGY.globalEnergy < 399 && ENRGY.globalEnergy > 200) {
-                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.angrySampleNames[getRandomInt(0, SOUND.angrySampleNames.length)]);
-                }
-
-                // if the something is fedup play fedup noises
-                else if (ENRGY.globalEnergy < 199) {
-                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.fedupSampleNames[getRandomInt(0, SOUND.fedupSampleNames.length)]);
-                }
-
-                if (endSceneFlag === false) SOUND.player.start();
-            }
-        }
-        teleportCount = 0;
-    }
-    teleportCount++;
 
     // gradually decrease the energy if its more than 0
     if (liveEnergyCounter % 10 === 0) {
@@ -361,12 +301,12 @@ const tick = () => {
             saturationIterate += 0.01;
             blurIterate += 0.01;
             if (SOUND.player.state === "stopped") {
-                if (iterateMainSamples < SOUND.endSamples.length) {
-                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.endSamples[iterateMainSamples]);
-                    iterateMainSamples++;
+                if (iterateEndSamples < SOUND.endSamples.length) {
+                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.endSamples[iterateEndSamples]);
+                    iterateEndSamples++;
                     SOUND.player.start();
                 }
-                if (iterateMainSamples === SOUND.endSamples.length) {
+                if (iterateEndSamples === SOUND.endSamples.length) {
                     const show = document.getElementsByClassName("show");
                     const hide = document.getElementsByClassName("hide");
                     // once object loaded change the landing text
@@ -376,8 +316,8 @@ const tick = () => {
                     for (var i = 0; i < hide.length; i++) {
                         hide[i].style.display = "none";
                     }
-                    while(scene.children.length > 0){ 
-                        scene.remove(scene.children[0]); 
+                    while (scene.children.length > 0) {
+                        scene.remove(scene.children[0]);
                     }
                 }
             }
@@ -393,6 +333,73 @@ const tick = () => {
             target.position.x = (getRandomInt(-40, 40) * 0.1);
             target.position.y = (getRandomInt(-40, 40) * 0.1);
             target.position.z = (getRandomInt(-10, 7) * 0.1);
+
+            // TRIGGER SPEACH EVERY TIME SOMETHING REACHES DESTINATION
+            // read the time for working out when speaking should happen
+            secondsSinceStart = returnTime();
+            if (somethingLoadedFlag === true && SOUND.toneStartFlag === true) {
+                if (SOUND.player.state === "stopped") {
+                    // if the something is happy play happy noises
+                    if (ENRGY.globalEnergy > 800) {
+                        if (secondsSinceStart < 60) {
+                            SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
+                        }
+                        if (secondsSinceStart > 60) {
+                            if (SOUND.garbledSamples.length > 0) {
+                                var tmpRandom = getRandomInt(0, SOUND.garbledSamples.length);
+                                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.garbledSamples[tmpRandom]);
+                                SOUND.garbledSamples.splice(tmpRandom, 1);
+                            }
+                        }
+                        if (secondsSinceStart > 120) {
+                            if (SOUND.normalConfusedSamples.length > 0) {
+                                var tmpRandom = getRandomInt(0, SOUND.normalConfusedSamples.length);
+                                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalConfusedSamples[tmpRandom]);
+                                SOUND.normalConfusedSamples.splice(tmpRandom, 1);
+                            }
+                        }
+                        if (secondsSinceStart > 150) {
+                            if (SOUND.normalSamples.length > 0) {
+                                var tmpRandom = getRandomInt(0, SOUND.normalSamples.length);
+                                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalSamples[tmpRandom]);
+                                SOUND.normalSamples.splice(tmpRandom, 1);
+                            }
+                        }
+                        if (secondsSinceStart > 240) {
+                            if (iterateMainSamples === SOUND.excitedSamples.length) {
+                                // play end scene
+                                console.log("END SCENE");
+                                endSceneFlag = true;
+                            } else if (iterateMainSamples < SOUND.excitedSamples.length) {
+                                SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.excitedSamples[iterateMainSamples]);
+                                iterateMainSamples++;
+                            }
+                        }
+                    }
+
+                    // if the something is medium happy play medium happy noises
+                    else if (ENRGY.globalEnergy < 799 && ENRGY.globalEnergy > 600) {
+                        SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumHappySampleNames[getRandomInt(0, SOUND.mediumHappySampleNames.length)]);
+                    }
+
+                    // if the something is medium play medium noises
+                    else if (ENRGY.globalEnergy < 599 && ENRGY.globalEnergy > 400) {
+                        SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumSampleNames[getRandomInt(0, SOUND.mediumSampleNames.length)]);
+                    }
+
+                    // if the something is angry play angry noises
+                    else if (ENRGY.globalEnergy < 399 && ENRGY.globalEnergy > 200) {
+                        SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.angrySampleNames[getRandomInt(0, SOUND.angrySampleNames.length)]);
+                    }
+
+                    // if the something is fedup play fedup noises
+                    else if (ENRGY.globalEnergy < 199) {
+                        SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.fedupSampleNames[getRandomInt(0, SOUND.fedupSampleNames.length)]);
+                    }
+
+                    if (endSceneFlag === false) SOUND.player.start();
+                }
+            }
         }
     }
 
@@ -406,6 +413,10 @@ const tick = () => {
 
 
     // Update Orbital Controls
+    _v.copy(controls.target);
+    controls.target.clamp(minPan, maxPan);
+    _v.sub(controls.target);
+    camera.position.sub(_v);
     controls.update()
 
     // Render
