@@ -61,6 +61,7 @@ let something;
 let somethingLoadedFlag = false;
 let action, mixer, clips, swimClip, floatClip;
 let actionSwim, actionFloat;
+const objects = [];
 
 // Load a glTF resource
 loader.load(
@@ -99,7 +100,6 @@ loader.load(
         target.position.y = (getRandomInt(-40, 40) * 0.1);
         target.position.z = (getRandomInt(-20, 7) * 0.1);
 
-
         // moosh the YUKA 'soul' with the three 'body'
         stVehicle.setRenderComponent(gltf.scene, sync);
     },
@@ -123,7 +123,7 @@ const importTexture = async (url, material) => {
 }
 
 //usage
-const mapGeo = new THREE.PlaneGeometry(7, 7);
+const mapGeo = new THREE.PlaneGeometry(6, 6);
 
 const matDetails = new THREE.MeshBasicMaterial();
 const meshDetails = new THREE.Mesh(mapGeo, matDetails);
@@ -216,7 +216,7 @@ function onPointerMove(event) {
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
-
+window.addEventListener('pointermove', onPointerMove);
 
 // keep the same size even if window is resized
 window.addEventListener('resize', () => {
@@ -268,6 +268,12 @@ let blurIterate = 0;
 let endSceneFlag = false;
 
 const tick = () => {
+    // update the picking ray with the camera and pointer position
+    raycaster.setFromCamera(pointer, camera);
+    // calculate objects intersecting the picking ray
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    
     // every now and then during the session, store the time 
     // into a local storage var called lastseen
     if (saveCount % 300 === 0) {
