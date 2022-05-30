@@ -97,12 +97,18 @@ function createAudioElements() {
         "wet": 0.6
     }).toDestination().start();
 
+    const feedbackDelay = new Tone.FeedbackDelay({
+        "delayTime": 0.1,
+        "feedback": 0.4,
+        "wet": 0.1
+    }).toDestination();
+
     vocalSamples = new Tone.ToneAudioBuffers(
         sampleLocations,
         () => {
             player = new Tone.Player({
                 volume: -6
-            }).connect(chorus);
+            }).connect(chorus).connect(feedbackDelay);
         });
 
     // create the synth

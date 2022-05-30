@@ -72,7 +72,6 @@ loader.load(
         scene.add(gltf.scene);
 
         gltf.scene.name = "something"
-        gltf.scene.castShadow = true;
         gltf.scenes; // Array<THREE.Group>
         gltf.cameras; // Array<THREE.Camera>
         gltf.asset; // Object
@@ -91,6 +90,7 @@ loader.load(
         // grab the something once its loaded and mark as loaded
         something = scene.getObjectByName("something")
         somethingLoadedFlag = true;
+        objects[0] = something;
 
         // disable for YUKA
         gltf.scene.matrixAutoUpdate = false;
@@ -128,25 +128,25 @@ const mapGeo = new THREE.PlaneGeometry(6, 6);
 const matDetails = new THREE.MeshBasicMaterial();
 const meshDetails = new THREE.Mesh(mapGeo, matDetails);
 meshDetails.translateZ(-0.5);
-meshDetails.castShadow = true;
+meshDetails.rotateZ(getRandomInt(0, 360));
 scene.add(meshDetails);
 
 const matOne = new THREE.MeshBasicMaterial();
 const meshOne = new THREE.Mesh(mapGeo, matOne);
 meshOne.translateZ(-0.8);
-meshOne.castShadow = true;
+meshOne.rotateZ(getRandomInt(0, 360));
 scene.add(meshOne);
 
 const matTwo = new THREE.MeshBasicMaterial();
 const meshTwo = new THREE.Mesh(mapGeo, matTwo);
+meshTwo.rotateZ(getRandomInt(0, 360));
 meshTwo.translateZ(-2.7);
-meshTwo.castShadow = true;
 scene.add(meshTwo);
 
 const matThree = new THREE.MeshBasicMaterial();
 const meshThree = new THREE.Mesh(mapGeo, matThree);
 meshThree.translateZ(-1.7);
-meshThree.castShadow = true;
+meshThree.rotateZ(getRandomInt(0, 360));
 scene.add(meshThree);
 
 //this is asynchronous
@@ -200,21 +200,15 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 var minPan = new THREE.Vector3(-3, -3, -3);
 var maxPan = new THREE.Vector3(3, 3, 3);
 var _v = new THREE.Vector3();
-// controls.addEventListener("change", function () {
-//     _v.copy(controls.target);
-//     controls.target.clamp(minPan, maxPan);
-//     _v.sub(controls.target);
-//     camera.position.sub(_v);
-// })
 
-const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
 function onPointerMove(event) {
     // calculate pointer position in normalized device coordinates
     // (-1 to +1) for both components
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    var rect = renderer.domElement.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 }
 window.addEventListener('pointermove', onPointerMove);
 
@@ -268,12 +262,6 @@ let blurIterate = 0;
 let endSceneFlag = false;
 
 const tick = () => {
-    // update the picking ray with the camera and pointer position
-    raycaster.setFromCamera(pointer, camera);
-    // calculate objects intersecting the picking ray
-    const intersects = raycaster.intersectObjects(scene.children, true);
-
-    
     // every now and then during the session, store the time 
     // into a local storage var called lastseen
     if (saveCount % 300 === 0) {
@@ -327,9 +315,6 @@ const tick = () => {
                     }
                 }
             }
-        } else {
-            meshDetails.rotation.z += 0.0001;
-            meshOne.rotation.z -= 0.0001;
         }
 
         // if the target and vehicle are same pos chill
@@ -343,7 +328,7 @@ const tick = () => {
             // TRIGGER SPEACH EVERY TIME SOMETHING REACHES DESTINATION
             // read the time for working out when speaking should happen
             secondsSinceStart = returnTime();
-            if (somethingLoadedFlag === true && SOUND.toneStartFlag === true) {
+            if (somethingLoadedFlag === true && SOUND.toneStartFlag === true && SOUND.player !== "undefined") {
                 if (SOUND.player.state === "stopped") {
                     // if the something is happy play happy noises
                     if (ENRGY.globalEnergy > 800) {
@@ -384,17 +369,17 @@ const tick = () => {
                     }
 
                     // if the something is medium happy play medium happy noises
-                    else if (ENRGY.globalEnergy < 799 && ENRGY.globalEnergy > 600) {
+                    else if (ENRGY.globalEnergy <= 799 && ENRGY.globalEnergy >= 600) {
                         SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumHappySampleNames[getRandomInt(0, SOUND.mediumHappySampleNames.length)]);
                     }
 
                     // if the something is medium play medium noises
-                    else if (ENRGY.globalEnergy < 599 && ENRGY.globalEnergy > 400) {
+                    else if (ENRGY.globalEnergy <= 599 && ENRGY.globalEnergy >= 400) {
                         SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.mediumSampleNames[getRandomInt(0, SOUND.mediumSampleNames.length)]);
                     }
 
                     // if the something is angry play angry noises
-                    else if (ENRGY.globalEnergy < 399 && ENRGY.globalEnergy > 200) {
+                    else if (ENRGY.globalEnergy <= 399 && ENRGY.globalEnergy >= 200) {
                         SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.angrySampleNames[getRandomInt(0, SOUND.angrySampleNames.length)]);
                     }
 
@@ -403,7 +388,7 @@ const tick = () => {
                         SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.fedupSampleNames[getRandomInt(0, SOUND.fedupSampleNames.length)]);
                     }
 
-                    if (endSceneFlag === false) SOUND.player.start();
+                    if (endSceneFlag === false && SOUND.player.buffer.loaded === true) SOUND.player.start();
                 }
             }
         }
@@ -416,7 +401,6 @@ const tick = () => {
 
     // const yDelta = yTime.update().getDelta();
     entityManager.update(delta);
-
 
     // Update Orbital Controls
     _v.copy(controls.target);
