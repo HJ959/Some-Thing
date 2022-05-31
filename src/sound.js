@@ -48,7 +48,10 @@ for (var i = 0; i < allStorySampleNames.length; i++) {
 
 let firstTimeDown = true;
 export let synth, loop, player, vocalSamples, chorus;
-
+let musicBPM = 80;
+export function increaseBPM() {
+    musicBPM+=9;
+}
 
 function handlePointerDown() {
     if (firstTimeDown === true) {
@@ -65,12 +68,12 @@ function handlePointerDown() {
     }
     // if audio isn't setup then call the async function
     if (toneStartFlag === false) setup();
-    
+
     if (firstTimeDown === false) {
         // speed up if we move
         if (toneStartFlag === true) {
             Tone.Transport.start();
-            Tone.Transport.bpm.rampTo(getRandomInt(180, 220), 0.1);
+            Tone.Transport.bpm.rampTo(getRandomInt(musicBPM - 20, musicBPM), 0.1);
         }
     }
 }

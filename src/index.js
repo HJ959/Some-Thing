@@ -335,31 +335,32 @@ const tick = () => {
                 if (SOUND.player.state === "stopped") {
                     // if the something is happy play happy noises
                     if (ENRGY.globalEnergy > 800) {
+                        SOUND.increaseBPM();
                         if (storyTimer <= 10) {
                             SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
                         }
-                        if (storyTimer >= 11 && storyTimer <= 20) {
+                        if (storyTimer >= 11 && storyTimer <= 18) {
                             if (SOUND.garbledSamples.length > 0) {
                                 var tmpRandom = getRandomInt(0, SOUND.garbledSamples.length);
                                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.garbledSamples[tmpRandom]);
                                 SOUND.garbledSamples.splice(tmpRandom, 1);
                             }
                         }
-                        if (storyTimer >= 21 && storyTimer <= 30) {
+                        if (storyTimer >= 19 && storyTimer <= 23) {
                             if (SOUND.normalConfusedSamples.length > 0) {
                                 var tmpRandom = getRandomInt(0, SOUND.normalConfusedSamples.length);
                                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalConfusedSamples[tmpRandom]);
                                 SOUND.normalConfusedSamples.splice(tmpRandom, 1);
                             }
                         }
-                        if (storyTimer >= 31 && storyTimer <= 40) {
+                        if (storyTimer >= 24 && storyTimer <= 28) {
                             if (SOUND.normalSamples.length > 0) {
                                 var tmpRandom = getRandomInt(0, SOUND.normalSamples.length);
                                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalSamples[tmpRandom]);
                                 SOUND.normalSamples.splice(tmpRandom, 1);
                             }
                         }
-                        if (storyTimer > 41) {
+                        if (storyTimer >= 29) {
                             if (iterateMainSamples === SOUND.excitedSamples.length) {
                                 // play end scene
                                 console.log("END SCENE");
@@ -388,7 +389,8 @@ const tick = () => {
 
                     // if the something is fedup play fedup noises
                     else if (ENRGY.globalEnergy < 199) {
-                        SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.fedupSampleNames[getRandomInt(0, SOUND.fedupSampleNames.length)]);
+                        if (storyTimer <= 18) SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.fedupSampleNames[getRandomInt(0, SOUND.fedupSampleNames.length)]);
+                        if (storyTimer >= 19) SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.sadSamples[getRandomInt(0, SOUND.sadSamples.length)]);
                     }
 
                     if (endSceneFlag === false && SOUND.player.buffer.loaded === true) SOUND.player.start();
