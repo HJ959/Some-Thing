@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rm dist/* && rm dev/*",
     "env": "env",
-    "start": "webpack serve --open --config webpack.dev.config.js",
+    "start": "webpack serve --open --host 0.0.0.0 --config webpack.dev.config.js",
     "prebuild-prod": "cp -r src/media/* dist/media",
     "build-prod": "webpack --config webpack.prod.config.js && babel dist -d dist",
     "prebuild-dev": "cp -r src/media/* dev/media",

@@ -67,10 +67,12 @@ function handlePointerDown() {
         if (toneStartFlag === false) setup();
 
     }
-    // speed up if we move
-    if (toneStartFlag === true) {
-        Tone.Transport.start();
-        Tone.Transport.bpm.rampTo(getRandomInt(180, 220), 0.1);
+    if (firstTimeDown === false) {
+        // speed up if we move
+        if (toneStartFlag === true) {
+            Tone.Transport.start();
+            Tone.Transport.bpm.rampTo(getRandomInt(180, 220), 0.1);
+        }
     }
 }
 document.addEventListener('pointerdown', handlePointerDown);

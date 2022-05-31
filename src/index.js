@@ -122,8 +122,6 @@ const importTexture = async (url, material) => {
     return texture;
 }
 
-
-
 //usage
 const mapGeo = new THREE.PlaneGeometry(6, 6);
 
@@ -296,26 +294,28 @@ const tick = () => {
             brightnessIterate += 0.01;
             saturationIterate += 0.01;
             blurIterate += 0.01;
-            if (SOUND.player.state === "stopped") {
-                if (iterateEndSamples < SOUND.endSamples.length) {
-                    SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.endSamples[iterateEndSamples]);
-                    iterateEndSamples++;
-                    SOUND.player.start();
-                }
-                if (iterateEndSamples === SOUND.endSamples.length) {
-                    const show = document.getElementsByClassName("show");
-                    const hide = document.getElementsByClassName("hide");
-                    // once object loaded change the landing text
-                    for (var i = 0; i < show.length; i++) {
-                        show[i].style.display = "block";
+            if (SOUND.player.state !== undefined) {
+                if (SOUND.player.state === "stopped") {
+                    if (iterateEndSamples < SOUND.endSamples.length) {
+                        SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.endSamples[iterateEndSamples]);
+                        iterateEndSamples++;
+                        SOUND.player.start();
                     }
-                    for (var i = 0; i < hide.length; i++) {
-                        hide[i].style.display = "none";
+                    if (iterateEndSamples === SOUND.endSamples.length) {
+                        const show = document.getElementsByClassName("show");
+                        const hide = document.getElementsByClassName("hide");
+                        // once object loaded change the landing text
+                        for (var i = 0; i < show.length; i++) {
+                            show[i].style.display = "block";
+                        }
+                        for (var i = 0; i < hide.length; i++) {
+                            hide[i].style.display = "none";
+                        }
+                        while (scene.children.length > 0) {
+                            scene.remove(scene.children[0]);
+                        }
+                        if (scene.children.length === 0) localStorage.clear();
                     }
-                    while (scene.children.length > 0) {
-                        scene.remove(scene.children[0]);
-                    }
-                    if (scene.children.length === 0) localStorage.clear();
                 }
             }
         }
@@ -331,7 +331,7 @@ const tick = () => {
             // TRIGGER SPEACH EVERY TIME SOMETHING REACHES DESTINATION
             // read the time for working out when speaking should happen
             storyTimer = localStorage.getItem("storyTimer");
-            if (somethingLoadedFlag === true && SOUND.toneStartFlag === true && SOUND.player !== "undefined") {
+            if (somethingLoadedFlag === true && SOUND.toneStartFlag === true && SOUND.player !== undefined) {
                 if (SOUND.player.state === "stopped") {
                     // if the something is happy play happy noises
                     if (ENRGY.globalEnergy > 800) {
