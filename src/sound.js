@@ -62,11 +62,10 @@ function handlePointerDown() {
             hide[i].style.display = "block";
         }
         firstTimeDown = false;
-
-        // if audio isn't setup then call the async function
-        if (toneStartFlag === false) setup();
-
     }
+    // if audio isn't setup then call the async function
+    if (toneStartFlag === false) setup();
+    
     if (firstTimeDown === false) {
         // speed up if we move
         if (toneStartFlag === true) {
