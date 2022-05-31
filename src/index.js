@@ -122,6 +122,8 @@ const importTexture = async (url, material) => {
     return texture;
 }
 
+
+
 //usage
 const mapGeo = new THREE.PlaneGeometry(6, 6);
 
@@ -253,7 +255,7 @@ let liveEnergyCounter = 0;
 let delta;
 let teleportCount = 0;
 const triggerSpeakIntervals = [200, 100, 300, 400, 500, 600, 700];
-let secondsSinceStart;
+let storyTimer;
 let iterateMainSamples = 0;
 let iterateEndSamples = 0;
 let brightnessIterate = 0;
@@ -313,6 +315,7 @@ const tick = () => {
                     while (scene.children.length > 0) {
                         scene.remove(scene.children[0]);
                     }
+                    if (scene.children.length === 0) localStorage.clear();
                 }
             }
         }
@@ -327,36 +330,36 @@ const tick = () => {
 
             // TRIGGER SPEACH EVERY TIME SOMETHING REACHES DESTINATION
             // read the time for working out when speaking should happen
-            secondsSinceStart = returnTime();
+            storyTimer = localStorage.getItem("storyTimer");
             if (somethingLoadedFlag === true && SOUND.toneStartFlag === true && SOUND.player !== "undefined") {
                 if (SOUND.player.state === "stopped") {
                     // if the something is happy play happy noises
                     if (ENRGY.globalEnergy > 800) {
-                        if (secondsSinceStart < 60) {
+                        if (storyTimer <= 10) {
                             SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.happySampleNames[getRandomInt(0, SOUND.happySampleNames.length)]);
                         }
-                        if (secondsSinceStart > 60) {
+                        if (storyTimer >= 11 && storyTimer <= 20) {
                             if (SOUND.garbledSamples.length > 0) {
                                 var tmpRandom = getRandomInt(0, SOUND.garbledSamples.length);
                                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.garbledSamples[tmpRandom]);
                                 SOUND.garbledSamples.splice(tmpRandom, 1);
                             }
                         }
-                        if (secondsSinceStart > 120) {
+                        if (storyTimer >= 21 && storyTimer <= 30) {
                             if (SOUND.normalConfusedSamples.length > 0) {
                                 var tmpRandom = getRandomInt(0, SOUND.normalConfusedSamples.length);
                                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalConfusedSamples[tmpRandom]);
                                 SOUND.normalConfusedSamples.splice(tmpRandom, 1);
                             }
                         }
-                        if (secondsSinceStart > 150) {
+                        if (storyTimer >= 31 && storyTimer <= 40) {
                             if (SOUND.normalSamples.length > 0) {
                                 var tmpRandom = getRandomInt(0, SOUND.normalSamples.length);
                                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalSamples[tmpRandom]);
                                 SOUND.normalSamples.splice(tmpRandom, 1);
                             }
                         }
-                        if (secondsSinceStart > 240) {
+                        if (storyTimer > 41) {
                             if (iterateMainSamples === SOUND.excitedSamples.length) {
                                 // play end scene
                                 console.log("END SCENE");
@@ -389,6 +392,9 @@ const tick = () => {
                     }
 
                     if (endSceneFlag === false && SOUND.player.buffer.loaded === true) SOUND.player.start();
+
+                    storyTimer++;
+                    localStorage.setItem("storyTimer", storyTimer);
                 }
             }
         }
@@ -416,9 +422,3 @@ const tick = () => {
     window.requestAnimationFrame(tick);
 }
 tick();
-
-
-//// function for working out time
-function returnTime() {
-    return (Math.abs((localStorage.getItem("startTime") - Date.now()) / 1000))
-}

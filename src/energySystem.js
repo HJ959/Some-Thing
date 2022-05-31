@@ -87,6 +87,7 @@ export function initEnergy() {
         } else {
             localStorage.setItem("energy", "0");
         }
+        if (localStorage.getItem("storyTimer") === null) localStorage.setItem("storyTimer", "0");
     }
 }
 
