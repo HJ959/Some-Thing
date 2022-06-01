@@ -81,13 +81,11 @@ function handlePointerDown() {
     }
 }
 document.addEventListener('pointerdown', handlePointerDown);
-// document.removeEventListener('pointerdown', handlePointerDown);
 
 function handlePointerUp() {
     if (toneStartFlag === true) Tone.Transport.pause();
 }
 document.addEventListener('pointerup', handlePointerUp);
-// document.removeEventListener('pointerup', handlePointerUp);
 
 async function setup() {
     await Tone.start();
@@ -145,6 +143,7 @@ function createAudioElements() {
     loop.start(0);
 
     Tone.Transport.start();
+    Tone.Transport.bpm.rampTo(getRandomInt(musicBPM - 20, musicBPM), 0.1);
     toneStartFlag = true;
 }
 
