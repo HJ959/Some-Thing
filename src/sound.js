@@ -50,7 +50,7 @@ let firstTimeDown = true;
 export let synth, loop, player, vocalSamples, chorus;
 let musicBPM = 80;
 export function increaseBPM() {
-    musicBPM += 9;
+    musicBPM += 5;
 }
 export function configureBPM(numberIterations) {
     musicBPM += numberIterations;
