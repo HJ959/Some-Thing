@@ -110,15 +110,25 @@ function createAudioElements() {
             "feedback": 0.4,
             "wet": 0.1
         }).toDestination();
+
+        vocalSamples = new Tone.ToneAudioBuffers(
+            sampleLocations,
+            () => {
+                player = new Tone.Player({
+                    volume: -6
+                }).connect(chorus).connect(feedbackDelay);
+            });
+    }
+    if (isMobile === true) {
+        vocalSamples = new Tone.ToneAudioBuffers(
+            sampleLocations,
+            () => {
+                player = new Tone.Player({
+                    volume: -6
+                }).connect(chorus);
+            });
     }
 
-    vocalSamples = new Tone.ToneAudioBuffers(
-        sampleLocations,
-        () => {
-            player = new Tone.Player({
-                volume: -6
-            }).connect(chorus).connect(feedbackDelay);
-        });
 
     // create the synth
     synth = new Tone.PolySynth().connect(chorus);
