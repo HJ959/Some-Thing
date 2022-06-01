@@ -50,7 +50,10 @@ let firstTimeDown = true;
 export let synth, loop, player, vocalSamples, chorus;
 let musicBPM = 80;
 export function increaseBPM() {
-    musicBPM+=9;
+    musicBPM += 9;
+}
+export function configureBPM(numberIterations) {
+    musicBPM += numberIterations;
 }
 
 function handlePointerDown() {
@@ -101,11 +104,13 @@ function createAudioElements() {
         "wet": 0.6
     }).toDestination().start();
 
-    const feedbackDelay = new Tone.FeedbackDelay({
-        "delayTime": 0.1,
-        "feedback": 0.4,
-        "wet": 0.1
-    }).toDestination();
+    if (isMobile === false) {
+        const feedbackDelay = new Tone.FeedbackDelay({
+            "delayTime": 0.1,
+            "feedback": 0.4,
+            "wet": 0.1
+        }).toDestination();
+    }
 
     vocalSamples = new Tone.ToneAudioBuffers(
         sampleLocations,

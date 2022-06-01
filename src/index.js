@@ -53,15 +53,13 @@ function sync(entity, renderComponent) {
     renderComponent.matrix.copy(entity.worldMatrix);
 }
 
-
 // Instantiate a loader
 const loader = new GLTFLoader();
 
 let something;
 let somethingLoadedFlag = false;
-let action, mixer, clips, swimClip, floatClip;
+let mixer, clips, swimClip, floatClip;
 let actionSwim, actionFloat;
-const objects = [];
 
 // Load a glTF resource
 loader.load(
@@ -89,8 +87,6 @@ loader.load(
 
         // grab the something once its loaded and mark as loaded
         something = scene.getObjectByName("something")
-        somethingLoadedFlag = true;
-        objects[0] = something;
 
         // disable for YUKA
         gltf.scene.matrixAutoUpdate = false;
@@ -102,6 +98,8 @@ loader.load(
 
         // moosh the YUKA 'soul' with the three 'body'
         stVehicle.setRenderComponent(gltf.scene, sync);
+
+        somethingLoadedFlag = true;
     },
     // called while loading is progressing
     function (xhr) {
@@ -123,7 +121,8 @@ const importTexture = async (url, material) => {
 }
 
 //usage
-const mapGeo = new THREE.PlaneGeometry(6, 6);
+const randomSizeMap = getRandomInt(4, 8);
+const mapGeo = new THREE.PlaneGeometry(randomSizeMap, randomSizeMap);
 
 const matDetails = new THREE.MeshBasicMaterial();
 const meshDetails = new THREE.Mesh(mapGeo, matDetails);
@@ -166,7 +165,7 @@ let sizes = {
 }
 
 // Camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 8);
 camera.position.x = 0;
 camera.position.y = 0;
 camera.position.z = 2;
@@ -180,7 +179,6 @@ controls.maxDistance = 4;
 controls.minDistance = 1;
 controls.enableRotate = false;
 
-
 // set up the controls, which buttons and touches do what
 controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
 controls.touches.ONE = THREE.TOUCH.PAN;
@@ -189,7 +187,7 @@ controls.touches.ONE = THREE.TOUCH.PAN;
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     alpha: true,
-    antialias: true
+    antialias: false
 });
 // renderer.setClearColor(0x000000, 0); // the default
 renderer.setSize(sizes.width, sizes.height);
@@ -200,17 +198,6 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 var minPan = new THREE.Vector3(-3, -3, -3);
 var maxPan = new THREE.Vector3(3, 3, 3);
 var _v = new THREE.Vector3();
-
-const pointer = new THREE.Vector2();
-
-function onPointerMove(event) {
-    // calculate pointer position in normalized device coordinates
-    // (-1 to +1) for both components
-    var rect = renderer.domElement.getBoundingClientRect();
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-}
-window.addEventListener('pointermove', onPointerMove);
 
 // keep the same size even if window is resized
 window.addEventListener('resize', () => {
@@ -251,8 +238,6 @@ const clock = new THREE.Clock();
 let saveCount = 0;
 let liveEnergyCounter = 0;
 let delta;
-let teleportCount = 0;
-const triggerSpeakIntervals = [200, 100, 300, 400, 500, 600, 700];
 let storyTimer;
 let iterateMainSamples = 0;
 let iterateEndSamples = 0;
@@ -260,6 +245,7 @@ let brightnessIterate = 0;
 let saturationIterate = 0;
 let blurIterate = 0;
 let endSceneFlag = false;
+let tmpRandom;
 
 const tick = () => {
     // every now and then during the session, store the time 
@@ -341,21 +327,21 @@ const tick = () => {
                         }
                         if (storyTimer >= 11 && storyTimer <= 18) {
                             if (SOUND.garbledSamples.length > 0) {
-                                var tmpRandom = getRandomInt(0, SOUND.garbledSamples.length);
+                                tmpRandom = getRandomInt(0, SOUND.garbledSamples.length);
                                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.garbledSamples[tmpRandom]);
                                 SOUND.garbledSamples.splice(tmpRandom, 1);
                             }
                         }
                         if (storyTimer >= 19 && storyTimer <= 23) {
                             if (SOUND.normalConfusedSamples.length > 0) {
-                                var tmpRandom = getRandomInt(0, SOUND.normalConfusedSamples.length);
+                                tmpRandom = getRandomInt(0, SOUND.normalConfusedSamples.length);
                                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalConfusedSamples[tmpRandom]);
                                 SOUND.normalConfusedSamples.splice(tmpRandom, 1);
                             }
                         }
                         if (storyTimer >= 24 && storyTimer <= 28) {
                             if (SOUND.normalSamples.length > 0) {
-                                var tmpRandom = getRandomInt(0, SOUND.normalSamples.length);
+                                tmpRandom = getRandomInt(0, SOUND.normalSamples.length);
                                 SOUND.player.buffer = SOUND.vocalSamples.get(SOUND.normalSamples[tmpRandom]);
                                 SOUND.normalSamples.splice(tmpRandom, 1);
                             }

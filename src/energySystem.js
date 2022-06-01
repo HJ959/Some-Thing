@@ -14,6 +14,7 @@ Would love to hear how though!
 // save the start time
 // this shouldn't live in here, but I feel
 // like it's easier to keep it here
+import * as SOUND from './sound'
 export function saveStartTime() {
     if (checkIfStorage() === true) {
         if (localStorage.getItem("startTime") === null) {
@@ -88,6 +89,7 @@ export function initEnergy() {
             localStorage.setItem("energy", "0");
         }
         if (localStorage.getItem("storyTimer") === null) localStorage.setItem("storyTimer", "0");
+        if (localStorage.getItem("storyTimer") !== null) SOUND.configureBPM(parseInt(localStorage.getItem("storyTimer")))
     }
 }
 
